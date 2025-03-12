@@ -1,0 +1,1 @@
+Modelo: Scikit-learn, Tipo de Dados: numerico, Framework: Flask não tem código base definido.

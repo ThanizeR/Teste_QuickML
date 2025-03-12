@@ -1,0 +1,7 @@
+Flask
+streamlit
+gradio
+torch
+torchvision
+tensorflow
+Pillow

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickML Creator</title>
+</head>
+<body>
+    <div class="container">
+        <h1>QuickML Creator</h1>
+        <form action="/generate_code" method="POST">
+            <label for="model_type">Tipo de Modelo:</label>
+            <select id="model_type" name="model_type">
+                <option value="PyTorch">PyTorch</option>
+                <option value="Scikit-learn">Scikit-learn</option>
+                <option value="TensorFlow">TensorFlow</option>
+                <option value="Keras">Keras</option>
+            </select><br>
+
+            <label for="data_type">Tipo de Dados:</label>
+            <select id="data_type" name="data_type">
+                <option value="imagem">Imagem</option>
+                <option value="texto">Texto</option>
+                <option value="numerico">Numérico</option>
+            </select><br>
+
+            <label for="framework">Framework:</label>
+            <select id="framework" name="framework">
+                <option value="Streamlit">Streamlit</option>
+                <option value="Flask">Flask</option>
+                <option value="Gradio">Gradio</option>
+            </select><br>
+
+            <button type="submit">Gerar Código</button>
+        </form>
+
+        {% if generated_code %}
+        <h2>Código Gerado</h2>
+        <pre>{{ generated_code }}</pre>
+        <form action="/download_code" method="POST">
+            <input type="hidden" name="model_type" value="{{ model_type }}">
+            <input type="hidden" name="data_type" value="{{ data_type }}">
+            <input type="hidden" name="framework" value="{{ framework }}">
+            <button type="submit">Baixar Código</button>
+        </form>
+        {% endif %}
+    </div>
+</body>
+</html>
