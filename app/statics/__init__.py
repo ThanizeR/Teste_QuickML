@@ -14,8 +14,8 @@ def create_app():
     login_manager.init_app(app)
     CSRFProtect(app)
 
-    from .auth import auth_bp
-    from .wizard import wizard_bp
+    from ..auth import auth_bp
+    from ..wizard import wizard_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(wizard_bp)
 
