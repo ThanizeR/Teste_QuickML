@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Download History</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<div class="container">
+  <h1>Your Download History</h1>
+  {% if downloads %}
+  <ul>
+    {% for d in downloads %}
+      <li>{{ d.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} - <a href="{{ url_for('static', filename='downloads/' + d.filename) }}" download>{{ d.filename }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No downloads yet.</p>
+  {% endif %}
+  <br/>
+  <a href="{{ url_for('index') }}">Back to Wizard</a>
+  <br/><br/>
+  <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+    <button type="submit">Sair</button>
+</form>
+</div>
+</body>
+</html>
+
