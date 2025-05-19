@@ -1,14 +1,19 @@
-<div class="container">
-  <h1>Login</h1>
-  <form method="post">
-    <label>Username:</label>
-    <input type="text" name="username" required />
+{% extends "base.html" %}
 
-    <label>Password:</label>
-    <input type="password" name="password" required />
-
-    <button type="submit">Login</button>
-  </form>
-  <a href="{{ url_for('register') }}">Don't have an account? Register</a>
+{% block content %}
+<div class="auth-container">
+    <div class="auth-left">
+        <p class="quote">"Toda grande jornada começa com o primeiro passo"</p>
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <div class="auth-right">
+        <h2>Login</h2>
+        <form method="POST">
+            <input type="text" name="username" placeholder="Usuário" required>
+            <input type="password" name="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <a href="{{ url_for('register') }}">Não tem uma conta? Registre-se</a>
+    </div>
 </div>
-
+{% endblock %}
