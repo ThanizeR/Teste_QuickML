@@ -3,8 +3,8 @@
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
-    color: #f5c2e7;
+    background: #ffffff;
+    color: #333333;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -12,10 +12,10 @@ body {
 }
 
 .auth-container {
-    background: #1e1e2f;
+    background: #f9f9f9;
     padding: 40px;
     border-radius: 12px;
-    box-shadow: 0 8px 24px rgba(245, 194, 231, 0.3);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
     display: flex;
     max-width: 900px;
     width: 100%;
@@ -25,7 +25,7 @@ body {
     flex: 1;
     text-align: center;
     padding-right: 30px;
-    border-right: 1px solid #444;
+    border-right: 1px solid #ddd;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -39,7 +39,7 @@ body {
 .auth-left .quote {
     font-size: 1.1em;
     font-style: italic;
-    color: #f5c2e7;
+    color: #666666;
 }
 
 .auth-right {
@@ -59,17 +59,17 @@ input, button {
     margin-bottom: 15px;
     padding: 12px;
     border-radius: 8px;
-    border: none;
+    border: 1px solid #ccc;
     font-size: 16px;
 }
 
 input {
-    background-color: #2d2d44;
-    color: #f5c2e7;
+    background-color: #ffffff;
+    color: #333333;
 }
 
 button {
-    background: linear-gradient(90deg, #d76d77, #8e2de2);
+    background: #4CAF50;
     color: white;
     font-weight: bold;
     cursor: pointer;
@@ -77,13 +77,54 @@ button {
 }
 
 button:hover {
-    background: linear-gradient(90deg, #8e2de2, #d76d77);
+    background: #45a049;
 }
 
 a {
-    color: #f5c2e7;
+    color: #007BFF;
     text-align: center;
     font-size: 0.9em;
     margin-top: 10px;
     text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+
+.navbar {
+    background-color: #004080;
+    color: white;
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-left .logo {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.navbar-right a {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.navbar-right a:hover {
+    color: #ffcc00;
+}
+
+.container {
+    margin-top: 80px;
+    padding: 20px;
 }

@@ -4,6 +4,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
+from flask import request, jsonify
+from flask import send_from_directory
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -232,7 +234,7 @@ def register():
             return redirect(url_for('register'))
 
         new_user = User(username=username, email=email,
-                        password=generate_password_hash(password, method='sha256'))
+                        password=generate_password_hash(password, method='pbkdf2:sha256'))
         db.session.add(new_user)
         db.session.commit()
         flash("Registered successfully! Please log in.", "success")
@@ -263,6 +265,18 @@ def logout():
     flash("Logged out", "info")
     return redirect(url_for('login'))
 
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html', user=current_user)
+
+from flask import send_from_directory
+
+@app.route('/download/<filename>')
+@login_required
+def download_file(filename):
+    return send_from_directory('downloads', filename, as_attachment=True)
+
 @app.route('/generate_code', methods=['POST'])
 @login_required
 def generate_code_route():
@@ -284,6 +298,26 @@ def generate_code_route():
 
     flash("Code generated and saved!", "success")
     return redirect(url_for('download_history'))
+
+@app.route('/preview_code', methods=['POST'])
+def preview_code():
+    data = request.json
+    framework = data.get('framework')
+    model_type = data.get('model_type')
+    dados_types = data.get('dados_types')  # esse campo pode ser usado para model_type alternativo se quiser
+    model_name = data.get('model_name') or "Meu Modelo"
+
+    # Vamos priorizar model_type = dados_types se for diferente? Ou usar model_type direto?
+    # Seu código atual usa model_type para isso, mas você tem dados_types separado.
+    # Vamos assumir que model_type será model_type, e dados_types só para inputs alternativos.
+    # Se quiser, pode alterar aqui para usar dados_types no model_type.
+
+    # Se quiser usar dados_types como model_type em casos, faça:
+    # model_type_final = dados_types if dados_types else model_type
+    model_type_final = model_type  # mantendo igual seu código atual
+
+    code = generate_code(framework, model_type_final, model_name)
+    return jsonify({'code': code})
 
 @app.route('/download_history')
 @login_required

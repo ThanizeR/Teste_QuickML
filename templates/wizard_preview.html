@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Código</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <div class="navbar">
+        <div class="navbar-left">
+            <span class="logo">Gerador de Código</span>
+        </div>
+        <div class="navbar-right">
+            <a href="{{ url_for('profile') }}">Perfil</a>
+            <a href="{{ url_for('download_history') }}">Downloads</a>
+            <a href="{{ url_for('logout') }}">Sair</a>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="container">
+        <h1>Gerar Código do Modelo</h1>
+
+        <!-- NOVO FORMULÁRIO COM PREVIEW -->
+        <form id="codeForm">
+            <label>Escolha o framework:</label><br>
+            <input type="radio" name="framework" value="streamlit" checked> Streamlit<br>
+            <input type="radio" name="framework" value="gradio"> Gradio<br><br>
+
+            <label>Escolha o tipo de modelo:</label><br>
+            <select name="model_type" required>
+                <option value="h5">Keras .h5</option>
+                <option value="resnet">ResNet</option>
+                <option value="pytorch">PyTorch</option>
+            </select><br><br>
+
+            <label>Escolha o tipo de dados:</label><br>
+            <select name="dados_types" required>
+                <option value="image_input">Entrada por Imagem</option>
+                <option value="numeric_input">Entrada Numérica</option>
+                <option value="text_input">Entrada de Texto</option>
+            </select><br><br>
+
+            <label>Nome do modelo:</label><br>
+            <input type="text" name="model_name" placeholder="Meu Modelo" required><br><br>
+        </form>
+
+        <!-- PREVIEW DINÂMICO -->
+        <h2>Pré-visualização do Código Gerado:</h2>
+        <pre id="codePreview" style="background:#f4f4f4; padding:10px; border:1px solid #ddd; max-height:400px; overflow:auto;"></pre>
+
+        <!-- BOTÃO OPCIONAL DE DOWNLOAD OU ENVIO FINAL -->
+        <form method="POST" action="{{ url_for('generate_code_route') }}">
+            <!-- os mesmos campos do formulário devem ser replicados aqui para envio real, ou você pode adaptar via JS -->
+            <input type="hidden" name="framework" id="hiddenFramework">
+            <input type="hidden" name="model_type" id="hiddenModelType">
+            <input type="hidden" name="dados_types" id="hiddenDadosTypes">
+            <input type="hidden" name="model_name" id="hiddenModelName">
+
+            <button type="submit">Gerar Código Final</button>
+        </form>
+
+        <br>
+        <a href="{{ url_for('download_history') }}">Ver Histórico de Downloads</a>
+    </div>
+
+    <script>
+        const form = document.getElementById('codeForm');
+        const preview = document.getElementById('codePreview');
+
+        const hiddenFramework = document.getElementById('hiddenFramework');
+        const hiddenModelType = document.getElementById('hiddenModelType');
+        const hiddenDadosTypes = document.getElementById('hiddenDadosTypes');
+        const hiddenModelName = document.getElementById('hiddenModelName');
+
+        async function updatePreview() {
+            const formData = new FormData(form);
+            const data = {
+                framework: formData.get('framework'),
+                model_type: formData.get('model_type'),
+                dados_types: formData.get('dados_types'),
+                model_name: formData.get('model_name')
+            };
+
+            // Atualiza os campos escondidos para envio final (opcional)
+            hiddenFramework.value = data.framework;
+            hiddenModelType.value = data.model_type;
+            hiddenDadosTypes.value = data.dados_types;
+            hiddenModelName.value = data.model_name;
+
+            const response = await fetch('/preview_code', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                preview.textContent = result.code;
+            } else {
+                preview.textContent = 'Erro ao carregar prévia.';
+            }
+        }
+
+        form.addEventListener('input', updatePreview);
+        window.addEventListener('load', updatePreview);
+    </script>
+</body>
+</html>

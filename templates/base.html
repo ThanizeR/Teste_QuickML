@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title>{% block title %}Autenticação{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <a href="{{ url_for('index') }}">Início</a> |
+    <a href="{{ url_for('profile') }}">Perfil</a> |
+    <a href="{{ url_for('download_history') }}">Downloads</a> |
+    <a href="{{ url_for('chat') }}">Chat</a> |
+    <a href="{{ url_for('logout') }}">Logout</a>
 </head>
 <body>
     {% block content %}{% endblock %}
