@@ -1,19 +1,25 @@
-{% extends "base.html" %}
-
-{% block content %}
-<div class="auth-container">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Autenticação{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="auth-container">
     <div class="auth-left">
-        <p class="quote">"Toda grande jornada começa com o primeiro passo"</p>
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+        <p class="quote">"Toda grande jornada começa com o primeiro passo"</p>
     </div>
     <div class="auth-right">
         <h2>Login</h2>
         <form method="POST">
             <input type="text" name="username" placeholder="Usuário" required>
             <input type="password" name="password" placeholder="Senha" required>
-            <button type="submit">Entrar</button>
+            <button type="submit" class="btn-rosa">Entrar</button>
         </form>
-        <a href="{{ url_for('register') }}">Não tem uma conta? Registre-se</a>
+        <a href="{{ url_for('register') }}" class="link-secundario">Não tem uma conta? Registre-se</a>
     </div>
 </div>
-{% endblock %}
+</body>
+</html>
