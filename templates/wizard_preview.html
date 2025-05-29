@@ -2,51 +2,73 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Autenticação{% endblock %}</title>
+    <title>Gerar Código</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="wizard-container">
-    <div class="navbar">
-        <div class="navbar-left logo">AutoML Designer</div>
-        <div class="navbar-right">
-            <a href="{{ url_for('index') }}">Início</a>
-            <a href="{{ url_for('download_history') }}">Downloads</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
-    </div>
 
+<!-- MENU LATERAL -->
+<div class="sidebar">
+    <!-- LOGO -->
+    <div class="logo-panel">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
+    </div>
+    <a href="{{ url_for('index') }}">🏠 Início</a>
+    <a href="{{ url_for('download_history') }}">⬇️ Downloads</a>
+    <a href="{{ url_for('logout') }}" class="logout-link">⎋ Logout</a>
+</div>
+
+<!-- CONTEÚDO PRINCIPAL -->
+<div class="main-content">
+
+    <!-- FORMULÁRIO E PREVIEW -->
     <div class="form-area">
+
         <h1>Gerar Código do Modelo</h1>
 
-        <!-- Formulário de configuração -->
+        <!-- FORMULÁRIO -->
         <form id="codeForm">
-            <label class="form-label" data-bs-toggle="tooltip" title="Escolha o framework para a interface da aplicação.">Framework:</label><br>
-            <input type="radio" name="framework" value="streamlit" checked> Streamlit
-            <input type="radio" name="framework" value="gradio" class="ms-3"> Gradio<br><br>
+            <!-- Primeira linha: Rádio + Tipo de Modelo -->
+            <div class="selection-row">
+                <div class="selection-item radio-group">
+                    <label class="form-label">Framework:</label>
+                    <label><input type="radio" name="framework" value="streamlit" checked> Streamlit</label>
+                    <label><input type="radio" name="framework" value="gradio"> Gradio</label>
+                </div>
 
-            <label class="form-label" data-bs-toggle="tooltip" title="Tipo do modelo a ser usado.">Tipo de Modelo:</label>
-            <select name="model_type" class="form-select" required>
-                <option value="h5">Keras .h5</option>
-                <option value="resnet">ResNet</option>
-                <option value="pytorch">PyTorch</option>
-            </select><br>
+                <div class="selection-item">
+                    <label class="form-label">Tipo de Modelo:</label>
+                    <select name="model_type" class="form-select" required>
+                        <option value="h5">Keras .h5</option>
+                        <option value="resnet">ResNet</option>
+                        <option value="pytorch">PyTorch</option>
+                    </select>
+                </div>
+            </div>
 
-            <label class="form-label" data-bs-toggle="tooltip" title="Tipo de dados que será usado.">Tipo de Dados:</label>
-            <select name="dados_types" class="form-select" required>
-                <option value="image_input">Imagem</option>
-                <option value="numeric_input">Numérico</option>
-                <option value="text_input">Texto</option>
-            </select><br>
-
-            <label class="form-label" data-bs-toggle="tooltip" title="Nome personalizado para o seu modelo.">Nome do Modelo:</label>
-            <input type="text" name="model_name" class="form-control" placeholder="Meu Modelo" required>
+            <!-- Segunda linha: Nome + Tipo de Dados -->
+            <div class="selection-row">
+                <div class="selection-item">
+                    <label class="form-label">Nome do Modelo:</label>
+                    <input type="text" name="model_name" class="form-control" placeholder="Meu Modelo" required>
+                </div>
+                <div class="selection-item">
+                    <label class="form-label">Tipo de Dados:</label>
+                    <select name="dados_types" class="form-select" required>
+                        <option value="image_input">Imagem</option>
+                        <option value="numeric_input">Numérico</option>
+                        <option value="text_input">Texto</option>
+                    </select>
+                </div>
+            </div>
         </form>
 
+        <!-- VISUALIZAÇÃO DO CÓDIGO -->
         <h2>Pré-visualização do Código</h2>
         <pre id="codePreview" class="code-preview"></pre>
 
-        <!-- Formulário de envio final -->
+        <!-- ENVIO FINAL -->
         <form method="POST" action="{{ url_for('generate_code_route') }}">
             <input type="hidden" name="framework" id="hiddenFramework">
             <input type="hidden" name="model_type" id="hiddenModelType">
@@ -57,12 +79,9 @@
     </div>
 </div>
 
-<!-- Bootstrap Tooltips -->
+<!-- SCRIPTS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
-
     const form = document.getElementById('codeForm');
     const preview = document.getElementById('codePreview');
     const hiddenFramework = document.getElementById('hiddenFramework');
@@ -101,5 +120,6 @@
     form.addEventListener('input', updatePreview);
     window.addEventListener('load', updatePreview);
 </script>
+
 </body>
 </html>
