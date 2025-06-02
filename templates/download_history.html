@@ -1,40 +1,35 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Autenticação{% endblock %}</title>
+    <title>{% block title %}Histórico de Downloads{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <div class="container">
-    <div class="navbar">
-        <div class="navbar-left logo">AutoML Designer</div>
-        <div class="navbar-right">
-            <a href="{{ url_for('index') }}">Início</a>
-            <a href="{{ url_for('download_history') }}">Downloads</a>
-            <a href="{{ url_for('logout') }}">Logout</a>
-        </div>
+        <nav class="menu-horizontal">
+            <a href="{{ url_for('index') }}">🏠 Início</a>
+            <a href="{{ url_for('download_history') }}"  class="active">⬇️ Downloads</a>
+            <a href="{{ url_for('logout') }}">⎋ Logout</a>
+        </nav>
+        <h2 class="page-title">Histórico de Downloads</h1>
+
+        {% if downloads %}
+            <ul class="download-list">
+                {% for d in downloads %}
+                    <li class="download-item">
+                        <span>
+                            {{ d.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} — {{ d.filename }}
+                        </span>
+                        <a href="{{ url_for('download_file', filename=d.filename) }}" class="btn">Download</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>Nenhum download encontrado.</p>
+        {% endif %}
+
+        <a href="{{ url_for('index') }}" class="btn secondary mt-4">Voltar</a>
     </div>
-
-    <h1 class="page-title">Histórico de Downloads</h1>
-
-    {% if downloads %}
-        <ul class="download-list">
-            {% for d in downloads %}
-                <li class="download-item">
-                    <span>
-                        {{ d.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} — {{ d.filename }}
-                    </span>
-                    <a href="{{ url_for('download_file', filename=d.filename) }}" class="btn">Download</a>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>Nenhum download encontrado.</p>
-    {% endif %}
-
-    <a href="{{ url_for('index') }}" class="btn secondary mt-4">Voltar</a>
-</div>
 </body>
 </html>

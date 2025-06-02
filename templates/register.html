@@ -6,21 +6,25 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<div class="auth-container">
+
+<div class="auth-container registro"> <!-- Adiciona classe 'registro' -->
     <div class="auth-left">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
-        <p class="quote">"Toda grande jornada começa com o primeiro passo"</p>
+        <p class="quote">"A tecnologia não precisa parecer uma língua diferente"</p>
     </div>
+
     <div class="auth-right">
-        <h2>Crie sua conta</h2>
-        <form method="POST">
-            <input type="text" name="username" placeholder="Nome de usuário" required>
-            <input type="email" name="email" placeholder="E-mail" required>
-            <input type="password" name="password" placeholder="Senha" required>
-            <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
-            <button type="submit" class="btn-rosa">Registrar</button>
-        </form>
-        <a href="{{ url_for('login') }}" class="link-secundario">Já tem uma conta? Faça login</a>
+        <div class="auth-box">
+            <h2>Crie sua conta</h2>
+            <form method="POST">
+                <input type="text" name="username" placeholder="Nome de usuário" required>
+                <input type="email" name="email" placeholder="E-mail" required>
+                <input type="password" name="password" placeholder="Senha" required>
+                <input type="password" name="confirm_password" placeholder="Confirmar senha" required>
+                <button type="submit" class="btn-rosa">Registrar</button>
+            </form>
+            <a href="{{ url_for('login') }}" class="link-secundario">Já tem uma conta? Faça login</a>
+        </div>
     </div>
 </div>
 </body>

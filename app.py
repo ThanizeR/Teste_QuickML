@@ -37,64 +37,50 @@ def load_user(user_id):
 
 # --- Wizard code generation functions ---
 
-def generate_streamlit_h5(model_name="Keras .h5 Model"):
+
+def generate_streamlit_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
     return f'''import streamlit as st
 from tensorflow.keras.models import load_model
-import numpy as np
 
 st.title("Model Deployment - {model_name}")
+
 uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
 if uploaded_file:
     model = load_model(uploaded_file)
     st.success("Model loaded!")
-    # Aqui, você pode adicionar lógica para receber input e usar o modelo
 
-input_data = st.number_input("Input numeric data")
+input_number = st.number_input("Enter a numeric value")
 if st.button("Predict"):
-    st.write("Prediction result (exemplo)")
+    st.write("Prediction for numeric input (exemplo)")
 '''
 
-def generate_streamlit_resnet(model_name="ResNet Model"):
+def generate_streamlit_h5_text_input(model_name="Keras .h5 Model with Text Input"):
     return f'''import streamlit as st
-import torch
-from torchvision import models, transforms
+from tensorflow.keras.models import load_model
+
+st.title("Model Deployment - {model_name}")
+
+uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
+if uploaded_file:
+    model = load_model(uploaded_file)
+    st.success("Model loaded!")
+
+input_text = st.text_area("Enter your text here")
+if st.button("Predict"):
+    st.write("Prediction for text input (exemplo)")
+'''
+
+def generate_streamlit_h5_image_input(model_name="Keras .h5 Model with Image Input"):
+    return f'''import streamlit as st
+from tensorflow.keras.models import load_model
 from PIL import Image
 
 st.title("Model Deployment - {model_name}")
 
-uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
-if uploaded_image:
-    image = Image.open(uploaded_image)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
-
-    preprocess = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                             std=[0.229, 0.224, 0.225]),
-    ])
-    input_tensor = preprocess(image).unsqueeze(0)
-    st.write("Imagem processada pronta para predição")
-'''
-
-def generate_streamlit_pytorch(model_name="PyTorch Model"):
-    return f'''import streamlit as st
-import torch
-
-st.title("Model Deployment - {model_name}")
-
-input_text = st.text_area("Enter text for prediction")
-
-if st.button("Predict"):
-    st.write("Prediction for input text (exemplo)")
-'''
-
-def generate_streamlit_image_input(model_name="Image Input Model"):
-    return f'''import streamlit as st
-from PIL import Image
-
-st.title("Model Deployment - {model_name}")
+uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
+if uploaded_file:
+    model = load_model(uploaded_file)
+    st.success("Model loaded!")
 
 uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
 if uploaded_image:
@@ -102,52 +88,86 @@ if uploaded_image:
     st.image(image, caption="Uploaded Image", use_column_width=True)
 '''
 
-def generate_streamlit_numeric_input(model_name="Numeric Input Model"):
+def generate_streamlit_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
     return f'''import streamlit as st
 
 st.title("Model Deployment - {model_name}")
 
 input_number = st.number_input("Enter a numeric value")
-
 if st.button("Predict"):
     st.write("Prediction for numeric input (exemplo)")
 '''
 
-def generate_streamlit_text_input(model_name="Text Input Model"):
+def generate_streamlit_resnet_text_input(model_name="ResNet Model with Text Input"):
     return f'''import streamlit as st
 
 st.title("Model Deployment - {model_name}")
 
 input_text = st.text_area("Enter your text here")
-
 if st.button("Predict"):
     st.write("Prediction for text input (exemplo)")
 '''
 
-def generate_gradio_h5(model_name="Keras .h5 Model"):
+def generate_streamlit_resnet_image_input(model_name="ResNet Model with Image Input"):
+    return f'''import streamlit as st
+from PIL import Image
+
+st.title("Model Deployment - {model_name}")
+
+uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
+if uploaded_image:
+    image = Image.open(uploaded_image)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+'''
+
+def generate_streamlit_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
+    return f'''import streamlit as st
+
+st.title("Model Deployment - {model_name}")
+
+input_number = st.number_input("Enter a numeric value")
+if st.button("Predict"):
+    st.write("Prediction for numeric input (exemplo)")
+'''
+
+def generate_streamlit_pytorch_text_input(model_name="PyTorch Model with Text Input"):
+    return f'''import streamlit as st
+
+st.title("Model Deployment - {model_name}")
+
+input_text = st.text_area("Enter your text here")
+if st.button("Predict"):
+    st.write("Prediction for text input (exemplo)")
+'''
+
+def generate_streamlit_pytorch_image_input(model_name="PyTorch Model with Image Input"):
+    return f'''import streamlit as st
+from PIL import Image
+
+st.title("Model Deployment - {model_name}")
+
+uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
+if uploaded_image:
+    image = Image.open(uploaded_image)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+'''
+
+# --- Funções geradoras Gradio ---
+
+def generate_gradio_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
     return f'''import gradio as gr
 from tensorflow.keras.models import load_model
 
-def predict(input_data):
+def predict(number):
     return "Prediction result (exemplo)"
 
 iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
 '''
 
-def generate_gradio_resnet(model_name="ResNet Model"):
+def generate_gradio_h5_text_input(model_name="Keras .h5 Model with Text Input"):
     return f'''import gradio as gr
-from PIL import Image
-
-def predict(image):
-    return "Prediction result (exemplo)"
-
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
-iface.launch()
-'''
-
-def generate_gradio_pytorch(model_name="PyTorch Model"):
-    return f'''import gradio as gr
+from tensorflow.keras.models import load_model
 
 def predict(text):
     return "Prediction result (exemplo)"
@@ -156,8 +176,9 @@ iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Dep
 iface.launch()
 '''
 
-def generate_gradio_image_input(model_name="Image Input Model"):
+def generate_gradio_h5_image_input(model_name="Keras .h5 Model with Image Input"):
     return f'''import gradio as gr
+from tensorflow.keras.models import load_model
 
 def predict(image):
     return "Prediction result (exemplo)"
@@ -166,7 +187,7 @@ iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", ti
 iface.launch()
 '''
 
-def generate_gradio_numeric_input(model_name="Numeric Input Model"):
+def generate_gradio_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
     return f'''import gradio as gr
 
 def predict(number):
@@ -176,7 +197,7 @@ iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model D
 iface.launch()
 '''
 
-def generate_gradio_text_input(model_name="Text Input Model"):
+def generate_gradio_resnet_text_input(model_name="ResNet Model with Text Input"):
     return f'''import gradio as gr
 
 def predict(text):
@@ -186,30 +207,79 @@ iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Dep
 iface.launch()
 '''
 
-def generate_code(framework, model_type, model_name):
-    # Map framework + model_type to proper generator
+def generate_gradio_resnet_image_input(model_name="ResNet Model with Image Input"):
+    return f'''import gradio as gr
+
+def predict(image):
+    return "Prediction result (exemplo)"
+
+iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
+iface.launch()
+'''
+
+def generate_gradio_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
+    return f'''import gradio as gr
+
+def predict(number):
+    return "Prediction result (exemplo)"
+
+iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
+iface.launch()
+'''
+
+def generate_gradio_pytorch_text_input(model_name="PyTorch Model with Text Input"):
+    return f'''import gradio as gr
+
+def predict(text):
+    return "Prediction result (exemplo)"
+
+iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
+iface.launch()
+'''
+
+def generate_gradio_pytorch_image_input(model_name="PyTorch Model with Image Input"):
+    return f'''import gradio as gr
+
+def predict(image):
+    return "Prediction result (exemplo)"
+
+iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
+iface.launch()
+'''
+
+# --- Função para escolher a função geradora correta ---
+
+def generate_code(framework, model_type, data_type, model_name):
+    key = f"{model_type}_{data_type}"
+
     if framework == 'streamlit':
         mapping = {
-            'h5': generate_streamlit_h5,
-            'resnet': generate_streamlit_resnet,
-            'pytorch': generate_streamlit_pytorch,
-            'image_input': generate_streamlit_image_input,
-            'numeric_input': generate_streamlit_numeric_input,
-            'text_input': generate_streamlit_text_input
+            'h5_numeric_input': generate_streamlit_h5_numeric_input,
+            'h5_text_input': generate_streamlit_h5_text_input,
+            'h5_image_input': generate_streamlit_h5_image_input,
+            'resnet_numeric_input': generate_streamlit_resnet_numeric_input,
+            'resnet_text_input': generate_streamlit_resnet_text_input,
+            'resnet_image_input': generate_streamlit_resnet_image_input,
+            'pytorch_numeric_input': generate_streamlit_pytorch_numeric_input,
+            'pytorch_text_input': generate_streamlit_pytorch_text_input,
+            'pytorch_image_input': generate_streamlit_pytorch_image_input,
         }
-    else:
+    else:  # gradio
         mapping = {
-            'h5': generate_gradio_h5,
-            'resnet': generate_gradio_resnet,
-            'pytorch': generate_gradio_pytorch,
-            'image_input': generate_gradio_image_input,
-            'numeric_input': generate_gradio_numeric_input,
-            'text_input': generate_gradio_text_input
+            'h5_numeric_input': generate_gradio_h5_numeric_input,
+            'h5_text_input': generate_gradio_h5_text_input,
+            'h5_image_input': generate_gradio_h5_image_input,
+            'resnet_numeric_input': generate_gradio_resnet_numeric_input,
+            'resnet_text_input': generate_gradio_resnet_text_input,
+            'resnet_image_input': generate_gradio_resnet_image_input,
+            'pytorch_numeric_input': generate_gradio_pytorch_numeric_input,
+            'pytorch_text_input': generate_gradio_pytorch_text_input,
+            'pytorch_image_input': generate_gradio_pytorch_image_input,
         }
 
-    generator = mapping.get(model_type)
+    generator = mapping.get(key)
     if not generator:
-        return f"# Unsupported model type: {model_type}"
+        return f"# Combinação não suportada: {key}"
     return generator(model_name)
 
 # --- Routes ---
@@ -277,47 +347,50 @@ from flask import send_from_directory
 def download_file(filename):
     return send_from_directory('downloads', filename, as_attachment=True)
 
+
 @app.route('/generate_code', methods=['POST'])
 @login_required
 def generate_code_route():
     framework = request.form.get('framework')
     model_type = request.form.get('model_type')
+    data_type = request.form.get('data_type')
     model_name = request.form.get('model_name')
 
-    code = generate_code(framework, model_type, model_name)
-    filename = f"{current_user.username}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.py"
+    if not all([framework, model_type, data_type, model_name]):
+        flash("Por favor, preencha todos os campos.", "danger")
+        return redirect(request.referrer or url_for('index'))
 
-    os.makedirs('downloads', exist_ok=True)
-    file_path = os.path.join('downloads', filename)
+    code = generate_code(framework, model_type, data_type, model_name)
+    filename = f"{framework}_{model_type}_{data_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.py"
+
+    downloads_dir = os.path.join(app.root_path, 'downloads')
+    os.makedirs(downloads_dir, exist_ok=True)
+    file_path = os.path.join(downloads_dir, filename)
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(code)
 
-    new_download = Download(filename=filename, user_id=current_user.id)
-    db.session.add(new_download)
+    # Salvar referência ao download no banco de dados
+    download_entry = Download(filename=filename, user_id=current_user.id)
+    db.session.add(download_entry)
     db.session.commit()
 
-    flash("Code generated and saved!", "success")
+    flash("Código gerado e salvo!", "success")
     return redirect(url_for('download_history'))
 
 @app.route('/preview_code', methods=['POST'])
 def preview_code():
-    data = request.json
+    data = request.json or {}
     framework = data.get('framework')
     model_type = data.get('model_type')
-    dados_types = data.get('dados_types')  # esse campo pode ser usado para model_type alternativo se quiser
-    model_name = data.get('model_name') or "Meu Modelo"
+    data_type = data.get('data_type')
+    model_name = data.get('model_name', 'Meu Modelo')
 
-    # Vamos priorizar model_type = dados_types se for diferente? Ou usar model_type direto?
-    # Seu código atual usa model_type para isso, mas você tem dados_types separado.
-    # Vamos assumir que model_type será model_type, e dados_types só para inputs alternativos.
-    # Se quiser, pode alterar aqui para usar dados_types no model_type.
+    if not all([framework, model_type, data_type]):
+        return jsonify({'error': 'Parâmetros insuficientes'}), 400
 
-    # Se quiser usar dados_types como model_type em casos, faça:
-    # model_type_final = dados_types if dados_types else model_type
-    model_type_final = model_type  # mantendo igual seu código atual
-
-    code = generate_code(framework, model_type_final, model_name)
+    code = generate_code(framework, model_type, data_type, model_name)
     return jsonify({'code': code})
+
 
 @app.route('/download_history')
 @login_required

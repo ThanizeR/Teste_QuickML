@@ -5,82 +5,132 @@
     <title>Gerar Código</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+
+    <style>
+        .custom-progress-container {
+            background-color: #eee;
+            border-radius: 6px;
+            height: 24px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            flex-grow: 1;
+            max-width: 200px;
+        }
+
+        .custom-progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #007bff; /* azul padrão */
+            color: white;
+            text-align: center;
+            line-height: 24px;
+            font-weight: 600;
+            transition: width 0.4s ease, background-color 0.4s ease;
+            border-radius: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
-
-<!-- MENU LATERAL -->
-<div class="sidebar">
-    <!-- LOGO -->
-    <div class="logo-panel">
-        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo">
-    </div>
-    <a href="{{ url_for('index') }}">🏠 Início</a>
+<!-- MENU HORIZONTAL -->
+<nav class="menu-horizontal">
+    <a href="{{ url_for('index') }}" class="active">🏠 Início</a>
     <a href="{{ url_for('download_history') }}">⬇️ Downloads</a>
-    <a href="{{ url_for('logout') }}" class="logout-link">⎋ Logout</a>
-</div>
+    <a href="{{ url_for('logout') }}">⎋ Logout</a>
+</nav>
 
 <!-- CONTEÚDO PRINCIPAL -->
 <div class="main-content">
+    <div class="content-box">
+        <div class="form-area">
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="{{ url_for('static', filename='logo2 vertical.png') }}" alt="Logo" class="top-logo" />
+            </div>
 
-    <!-- FORMULÁRIO E PREVIEW -->
-    <div class="form-area">
+            <form id="codeForm">
+                <!-- Linha 1: Framework + Tipo de Modelo -->
+                <div class="selection-row">
+                    <div class="selection-item radio-group">
+                        <label class="form-label">
+                            <span data-bs-toggle="tooltip" title="Selecione o framework que deseja usar.">Framework:</span>
+                        </label>
+                        <label><input type="radio" name="framework" value="streamlit" checked> Streamlit</label>
+                        <label><input type="radio" name="framework" value="gradio"> Gradio</label>
+                    </div>
 
-
-        <!-- FORMULÁRIO -->
-        <form id="codeForm">
-            <!-- Primeira linha: Rádio + Tipo de Modelo -->
-            <div class="selection-row">
-                <div class="selection-item radio-group">
-                    <label class="form-label">Framework:</label>
-                    <label><input type="radio" name="framework" value="streamlit" checked> Streamlit</label>
-                    <label><input type="radio" name="framework" value="gradio"> Gradio</label>
+                    <div class="selection-item">
+                        <label class="form-label">
+                            <span data-bs-toggle="tooltip" title="Tipo de modelo a ser utilizado.">Tipo de Modelo:</span>
+                        </label>
+                        <select name="model_type" class="form-select" required>
+                            <option value="" disabled selected>Selecione o tipo de modelo</option>
+                            <option value="h5">Keras .h5</option>
+                            <option value="resnet">ResNet</option>
+                            <option value="pytorch">PyTorch</option>
+                        </select>
+                    </div>
                 </div>
 
-                <div class="selection-item">
-                    <label class="form-label">Tipo de Modelo:</label>
-                    <select name="model_type" class="form-select" required>
-                        <option value="h5">Keras .h5</option>
-                        <option value="resnet">ResNet</option>
-                        <option value="pytorch">PyTorch</option>
-                    </select>
+                <!-- Linha 2: Nome + Tipo de Dados -->
+                <div class="selection-row">
+                    <div class="selection-item">
+                        <label class="form-label">
+                            <span data-bs-toggle="tooltip" title="Nome personalizado para seu modelo.">Nome do Modelo:</span>
+                        </label>
+                        <input type="text" name="model_name" class="form-control" placeholder="Meu Modelo" required>
+                    </div>
+
+                    <div class="selection-item">
+                        <label class="form-label">
+                            <span data-bs-toggle="tooltip" title="Tipo de entrada de dados para o modelo.">Tipo de Dados:</span>
+                        </label>
+                        <select name="data_type" class="form-select" required>
+                            <option value="" disabled selected>Selecione o tipo de dado</option>
+                            <option value="image_input">Imagem</option>
+                            <option value="numeric_input">Numérico</option>
+                            <option value="text_input">Texto</option>
+                        </select>
+                    </div>
+                </div>
+            </form>
+
+            <h2>Pré-visualização do Código</h2>
+            <div class="code-preview-wrapper" style="position: relative;">
+                <button id="copyBtn" class="btn btn-sm btn-outline-secondary" style="position: absolute; top: 10px; right: 10px;">
+                    📋 Copiar
+                </button>
+                <pre id="codePreview" class="code-preview"></pre>
+            </div>
+
+            <!-- Botão de Download e Barra de Progresso lado a lado -->
+            <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
+                <form method="POST" action="{{ url_for('generate_code_route') }}">
+                    <input type="hidden" name="framework" id="hiddenFramework">
+                    <input type="hidden" name="model_type" id="hiddenModelType">
+                    <input type="hidden" name="data_type" id="hiddenDadosTypes">
+                    <input type="hidden" name="model_name" id="hiddenModelName">
+                    <button type="submit" class="btn-pink" id="downloadBtn">Download</button>
+                </form>
+                <div class="custom-progress-container">
+                    <div id="progressBar" class="custom-progress-bar">
+                        <!-- Texto atualizado pelo JS -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Segunda linha: Nome + Tipo de Dados -->
-            <div class="selection-row">
-                <div class="selection-item">
-                    <label class="form-label">Nome do Modelo:</label>
-                    <input type="text" name="model_name" class="form-control" placeholder="Meu Modelo" required>
-                </div>
-                <div class="selection-item">
-                    <label class="form-label">Tipo de Dados:</label>
-                    <select name="dados_types" class="form-select" required>
-                        <option value="image_input">Imagem</option>
-                        <option value="numeric_input">Numérico</option>
-                        <option value="text_input">Texto</option>
-                    </select>
-                </div>
-            </div>
-        </form>
-
-        <!-- VISUALIZAÇÃO DO CÓDIGO -->
-        <h2>Pré-visualização do Código</h2>
-        <pre id="codePreview" class="code-preview"></pre>
-
-        <!-- ENVIO FINAL -->
-        <form method="POST" action="{{ url_for('generate_code_route') }}">
-            <input type="hidden" name="framework" id="hiddenFramework">
-            <input type="hidden" name="model_type" id="hiddenModelType">
-            <input type="hidden" name="dados_types" id="hiddenDadosTypes">
-            <input type="hidden" name="model_name" id="hiddenModelName">
-            <button type="submit" class="btn-pink">Download</button>
-        </form>
+        </div>
     </div>
 </div>
 
-<!-- SCRIPTS -->
+<!-- BOOTSTRAP + TOOLTIP -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- SCRIPT FINAL -->
 <script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    tooltipTriggerList.forEach(el => new bootstrap.Tooltip(el));
+
     const form = document.getElementById('codeForm');
     const preview = document.getElementById('codePreview');
     const hiddenFramework = document.getElementById('hiddenFramework');
@@ -93,31 +143,100 @@
         const data = {
             framework: formData.get('framework'),
             model_type: formData.get('model_type'),
-            dados_types: formData.get('dados_types'),
-            model_name: formData.get('model_name')
+            data_type: formData.get('data_type'),
+            model_name: formData.get('model_name') || 'Meu Modelo'
         };
 
         hiddenFramework.value = data.framework;
         hiddenModelType.value = data.model_type;
-        hiddenDadosTypes.value = data.dados_types;
+        hiddenDadosTypes.value = data.data_type;
         hiddenModelName.value = data.model_name;
 
-        const response = await fetch('/preview_code', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        try {
+            const response = await fetch('/preview_code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
 
-        if (response.ok) {
-            const result = await response.json();
-            preview.textContent = result.code;
-        } else {
-            preview.textContent = 'Erro ao carregar pré-visualização.';
+            if (response.ok) {
+                const result = await response.json();
+                preview.textContent = result.code;
+            } else {
+                preview.textContent = 'Erro ao carregar pré-visualização.';
+            }
+        } catch (err) {
+            console.error(err);
+            preview.textContent = 'Erro na conexão com o servidor.';
         }
     }
 
+    form.addEventListener('change', updatePreview);
     form.addEventListener('input', updatePreview);
     window.addEventListener('load', updatePreview);
+
+    // Botão para copiar código
+    document.getElementById('copyBtn').addEventListener('click', function () {
+        const code = document.getElementById('codePreview').textContent;
+        navigator.clipboard.writeText(code).then(() => {
+            this.textContent = '✅ Copiado!';
+            setTimeout(() => {
+                this.textContent = '📋 Copiar';
+            }, 2000);
+        }).catch(() => {
+            this.textContent = '❌ Erro';
+        });
+    });
+
+    // Atualização da barra de progresso (etapas 1 a 5)
+    function updateProgressBar() {
+        const formData = new FormData(form);
+        let step = 1;
+
+        if (formData.get('framework')) step++;
+        if (formData.get('model_type') && formData.get('model_type') !== '') step++;
+        if (formData.get('model_name')) step++;
+        if (formData.get('data_type') && formData.get('data_type') !== '') step++;
+
+        const percent = (step / 5) * 100;
+        const progressBar = document.getElementById('progressBar');
+        progressBar.style.width = percent + "%";
+        progressBar.style.backgroundColor = '#007bff'; // azul padrão
+        progressBar.textContent = `Etapa ${step} de 5`;
+    }
+
+    form.addEventListener('change', () => {
+        updatePreview();
+        updateProgressBar();
+    });
+
+    form.addEventListener('input', () => {
+        updatePreview();
+        updateProgressBar();
+    });
+
+    window.addEventListener('load', () => {
+        updatePreview();
+        updateProgressBar();
+    });
+
+    // Ao clicar em Download, anima barra para verde e texto "Concluído!" antes de submeter o formulário
+    const downloadBtn = document.getElementById('downloadBtn');
+    const progressBar = document.getElementById('progressBar');
+
+    downloadBtn.addEventListener('click', function(event) {
+        event.preventDefault(); // impede envio imediato
+
+        // Anima a barra para 100% e verde
+        progressBar.style.width = '100%';
+        progressBar.style.backgroundColor = '#28a745'; // verde
+        progressBar.textContent = 'Concluído!';
+
+        // Envia o formulário após 2 segundos
+        setTimeout(() => {
+            event.target.form.submit();
+        }, 2000);
+    });
 </script>
 
 </body>

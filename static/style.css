@@ -1,81 +1,195 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
 
 :root {
-    --bg-color: #0e003b;
-    --primary-color: #ff0073;
-    --text-light: #ffffff;
-    --text-muted: #cccccc;
-    --card-bg: #1a103d;
-    --input-bg: #2d1a58;
-    --border-color: #ff007380;
+  --bg-color: #0e003b;
+  --primary-color: #ff0073;
+  --primary-hover: white;
+  --text-light: #ffffff;
+  --text-muted: #cccccc;
+  --card-bg: #1a103d;
+  --input-bg: #2d1a58;
+  --border-color: #ff007380;
+  --transition: 0.3s ease;
+  --shadow: 0 0 20px rgba(255, 0, 115, 0.15);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-    background-color: var(--bg-color);
-    color: var(--text-light);
-    display: flex;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-light);
 }
 
-/* LAYOUT MENU */
-.sidebar {
-    width: 220px;
-    height: 100vh;
-    background-color: var(--card-bg);
+.menu-horizontal {
+    background-color: #0e003b; /* rosa pink */
+    padding: 12px 30px;
     display: flex;
-    flex-direction: column;
+    gap: 30px;
+    justify-content: flex-start;
     align-items: center;
-    padding: 20px 10px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    font-weight: 600;
+    font-size: 1.1rem;
 }
 
-.sidebar img {
-    width: 100px;
-    margin-bottom: 30px;
-}
-
-.sidebar a {
-    color: var(--text-light);
-    text-decoration: none;
-    margin: 12px 0;
-    font-weight: 500;
-    padding: 8px 12px;
-    border-radius: 6px;
-    transition: background 0.2s ease;
-}
-
-.sidebar a:hover {
-    background-color: var(--primary-color);
+.menu-horizontal a {
     color: white;
+    text-decoration: none;
+    position: relative;
+    padding: 8px 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
 }
 
-.logout-link {
-    margin-top: auto;
-    font-size: 0.95em;
-    opacity: 0.8;
+/* Linha underline invisível inicialmente */
+.menu-horizontal a::after {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 3px;
+    bottom: 0;
+    left: 0;
+    background-color: #ff0073;
+    transition: width 0.3s ease;
+    border-radius: 2px;
 }
 
-/* CONTEÚDO PRINCIPAL */
-.main-content {
-    margin-left: 240px;
-    padding: 40px;
+/* Ao passar o mouse, underline cresce */
+.menu-horizontal a:hover::after {
     width: 100%;
-    box-sizing: border-box;
-    color: var(--text-light);
 }
 
-/* ÁREA DO FORMULÁRIO */
+/* Cor do texto muda no hover */
+.menu-horizontal a:hover {
+    color: #fff; /* pode trocar a cor aqui se quiser */
+}
+
+/* Link ativo com underline permanente */
+.menu-horizontal a.active::after {
+    width: 100%;
+}
+
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza verticalmente */
+  align-items: center;     /* Centraliza horizontalmente */
+  min-height: 100vh;       /* Ocupa a altura total da viewport */
+  padding: 20px 20px;
+  background-color: var(--bg-color); /* Fundo escuro */
+  color: var(--text-light);
+  text-align: center;      /* Centraliza texto dentro */
+  gap: 30px;               /* Espaçamento entre elementos */
+  box-sizing: border-box;
+}
+
+/* Opcional: limita a largura do conteúdo para melhor leitura */
+.main-content > * {
+  max-width: 900px;
+  width: 100%;
+}
+
+/* Se usar títulos, alinhe no centro */
+.main-content h1,
+.main-content h2,
+.main-content h3 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+}
+
+/* Exemplo de um container interno para formularios, cards ou blocos */
+.main-content .content-box {
+  background-color: var(--card-bg);
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  width: 100%;
+}
+
+.content-box {
+  background-color: var(--card-bg); /* ex: cor do fundo do card */
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: var(--shadow, 0 4px 8px rgba(0, 0, 0, 0.15));
+  width: 100%;
+  max-width: 900px; /* opcional, limita largura */
+  margin: 0 auto; /* centraliza horizontalmente */
+  box-sizing: border-box;
+}
+
+.content-box h2 {
+  color: white;
+}
+
+#codePreview {
+  text-align: left;         /* Alinha o texto à esquerda */
+  white-space: pre-wrap;    /* Quebra linhas automaticamente, se necessário */
+  background-color: white; /* Opcional: fundo mais escuro estilo editor */
+  padding: 20px;
+  border-radius: 8px;
+  color: #0e003b;
+  font-family: 'Courier New', monospace;
+  font-weight: bold; /* Deixa o texto em negrito */
+  box-shadow: var(--shadow, 0 4px 8px rgba(0, 0, 0, 0.15));
+}
+
+.code-preview-wrapper {
+  position: relative;
+}
+
+#copyBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  z-index: 2;
+}
+.custom-progress-container {
+    width: 100%;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    height: 25px;
+    overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.custom-progress-bar {
+    height: 100%;
+    width: 20%; /* largura inicial, ajuste via JS ou inline */
+    background-color: #28a745; /* verde para indicar sucesso */
+    color: white;
+    text-align: center;
+    line-height: 25px; /* para centralizar texto verticalmente */
+    font-weight: bold;
+    border-radius: 20px 0 0 20px;
+    transition: width 0.4s ease, background-color 0.4s ease;
+}
+
+/* Quando a barra estiver em "ativo" (download iniciado) */
+.custom-progress-bar.active {
+    background-color: #28a745; /* verde */
+}
+
+.top-logo {
+    max-width: 300px; /* tamanho máximo, ajusta conforme quiser */
+    height: auto;
+    display: inline-block;
+}
+
+
+/* FORMULÁRIO */
 .form-area {
     background-color: var(--card-bg);
     border-radius: 12px;
     padding: 30px;
     box-shadow: 0 0 20px rgba(255, 0, 115, 0.1);
+    color: var(--text-light);
 }
 
 h1, h2 {
@@ -153,7 +267,7 @@ textarea::placeholder {
     background-color: #e60065;
 }
 
-/* Pré-visualização */
+/* PRÉ-VISUALIZAÇÃO */
 .code-preview {
     background-color: #f8f8f2;
     color: #1e1e2f;
@@ -167,29 +281,166 @@ textarea::placeholder {
     margin-top: 20px;
 }
 
-/* Bootstrap Tooltips (se usado) */
+/* Tooltips */
 .tooltip-inner {
     background-color: var(--primary-color);
     color: white;
 }
-
 .tooltip-arrow::before {
     border-top-color: var(--primary-color);
 }
 
-/* Responsivo */
-@media (max-width: 900px) {
-    .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-        padding: 10px;
-    }
+/* -------------------- LOGIN E REGISTRO -------------------- */
+.auth-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 40px 80px;
+    gap: 80px;
+    transform: translateX(13%); /* ✅ MOVE tudo para a direita */
+}
+.auth-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 400px;
+}
 
+.auth-left img {
+    width: 320px;
+    margin-bottom: -20px;
+}
+
+.auth-left .quote {
+    font-style: normal;
+    color: var(--text-muted);
+    font-size: 1.3rem;
+    margin-top: 0.5px;
+}
+
+.auth-right {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 420px;
+    width: 100%;
+}
+
+.auth-box {
+    background-color: var(--card-bg);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(255, 0, 115, 0.2);
+    width: 100%;
+}
+
+.auth-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: var(--primary-color);
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+input, select, .form-control {
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--input-bg);
+    color: var(--text-light);
+}
+
+input::placeholder {
+    color: var(--text-muted);
+}
+
+button.btn-rosa, button.btn-pink {
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: bold;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button.btn-rosa:hover, button.btn-pink:hover {
+    background-color: #e60065;
+}
+
+.link-secundario {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+.link-secundario:hover {
+    color: var(--primary-color);
+}
+
+.auth-container.registro {
+    transform: translateX(13%); /* deslocamento menor que o login */
+}
+
+.download-list {
+  list-style: none;
+  padding-left: 0;
+  max-width: 940px; /* alinhado com largura ajustada */
+  margin: 0 auto;
+}
+
+h2 {
+  margin-left: 33px;
+}
+
+.download-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  min-height: 40px;
+  border: 1px solid #ff0073cc;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  margin-left: 33px; /* alinhamento com h2 e botão */
+  margin-right: 33px;
+  background-color: #2c2c2c; /* fundo escuro visível */
+  color: white;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease, border-color 0.3s ease;
+}
+
+.btn.secondary {
+  background-color: #e91e63;
+  color: #fff;
+  border: none;
+  padding: 8px 20px;
+  font-size: 14px;
+  border-radius: 6px;
+  text-decoration: none;
+  display: inline-block;
+  margin-left: 33px;
+  transition: background-color 0.2s ease;
+}
+
+.btn.secondary:hover {
+  background-color: #d81b60;
+  color: #fff;
+}
+
+
+/* RESPONSIVO */
+@media (max-width: 900px) {
     .main-content {
-        margin-left: 0;
-        padding: 20px;
+        padding: 80px 20px 20px 20px;
     }
 
     .form-area {
@@ -199,4 +450,38 @@ textarea::placeholder {
     .selection-row {
         flex-direction: column;
     }
+
+    .sidebar-collapsible {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        justify-content: space-around;
+        left: 0 !important;
+        top: 50px;
+        padding: 10px;
+    }
+
+    .menu-icon {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 1002;
+    }
+    .auth-container {
+        flex-direction: column;
+        gap: 40px;
+        padding: 30px 20px;
+    }
+
+    .auth-left img {
+        width: 200px;
+    }
+
+    .auth-right {
+        justify-content: center;
+    }
+    .auth-box {
+        max-width: 100%;
+    }
 }
+
