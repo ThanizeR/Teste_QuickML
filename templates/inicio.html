@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Início - Gerador de Código</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <!-- Menu Horizontal -->
+    <nav class="menu-horizontal">
+        <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
+        <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
+        <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
+        <a href="{{ url_for('logout') }}">⎋ Logout</a>
+    </nav>
+
+
+  <!-- Conteúdo da Página Inicial -->
+    <section id="inicio" class="main-content">
+    <div class="inicio-container">
+        <div style="text-align: center; margin: 20px 0;">
+        <img src="{{ url_for('static', filename='logo2 vertical.png') }}" alt="Logo" class="top-logo" />
+        </div>
+
+        <h1>Bem-vindo ao QuickML Creator</h1>
+
+        <p>
+        O <strong>QuickML Creator</strong> é uma ferramenta criada para ajudar você a gerar códigos automaticamente a partir de configurações simples e intuitivas.
+        Com poucos cliques, você define os parâmetros do seu projeto e obtém o código pronto para uso — sem necessidade de programar do zero.
+        </p>
+
+        <p>
+        A navegação foi pensada para ser clara e objetiva, dividida em três etapas principais:
+        </p>
+
+        <ol>
+        <li><strong>🏠 Início:</strong> Página inicial, exibe como funciona a aplicação e como utilizá-la de forma eficiente.</li>
+        <li><strong>⚙️ Gerar Código:</strong> Selecione as configurações desejadas e gere seu código automaticamente, em tempo real.</li>
+        <li><strong>⬇️ Downloads:</strong> Acesse os códigos gerados e faça o download com apenas um clique.</li>
+        </ol>
+
+        <p>
+        Utilize o menu no topo da página para navegar entre as etapas. Todo o processo é rápido, eficiente e pensado para poupar seu tempo, mesmo que você não tenha experiência com programação.
+        </p>
+
+        <p>
+        Se tiver dúvidas durante o uso, você pode contar com o <strong>chat integrado</strong> localizado no canto inferior direito para receber orientações e suporte ao vivo na página <strong> Gerar Código</strong>.
+        </p>
+
+        <p>
+        Explore, teste e aproveite ao máximo o poder da automação com o QuickML Creator!
+        </p>
+    </div>
+    </section>
+
+
+</body>
+</html>

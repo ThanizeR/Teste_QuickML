@@ -19,11 +19,21 @@
   padding: 0;
 }
 
+html {
+  background-color: var(--bg-color);
+}
+
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
   color: var(--text-light);
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+  overflow-x: hidden;
 }
+
 
 .menu-horizontal {
     background-color: #0e003b; /* rosa pink */
@@ -112,15 +122,16 @@ body {
 }
 
 .content-box {
-  background-color: var(--card-bg); /* ex: cor do fundo do card */
-  padding: 10px;
+  background-color: var(--card-bg);
+  padding: 30px;
   border-radius: 12px;
-  box-shadow: var(--shadow, 0 4px 8px rgba(0, 0, 0, 0.15));
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* mesma sombra suave */
   width: 100%;
-  max-width: 900px; /* opcional, limita largura */
-  margin: 0 auto; /* centraliza horizontalmente */
+  max-width: 900px;
+  margin: 0 auto;
   box-sizing: border-box;
 }
+
 
 .content-box h2 {
   color: white;
@@ -150,31 +161,7 @@ body {
   cursor: pointer;
   z-index: 2;
 }
-.custom-progress-container {
-    width: 100%;
-    background-color: #f0f0f0;
-    border-radius: 20px;
-    height: 25px;
-    overflow: hidden;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
-}
 
-.custom-progress-bar {
-    height: 100%;
-    width: 20%; /* largura inicial, ajuste via JS ou inline */
-    background-color: #28a745; /* verde para indicar sucesso */
-    color: white;
-    text-align: center;
-    line-height: 25px; /* para centralizar texto verticalmente */
-    font-weight: bold;
-    border-radius: 20px 0 0 20px;
-    transition: width 0.4s ease, background-color 0.4s ease;
-}
-
-/* Quando a barra estiver em "ativo" (download iniciado) */
-.custom-progress-bar.active {
-    background-color: #28a745; /* verde */
-}
 
 .top-logo {
     max-width: 300px; /* tamanho máximo, ajusta conforme quiser */
@@ -188,9 +175,10 @@ body {
     background-color: var(--card-bg);
     border-radius: 12px;
     padding: 30px;
-    box-shadow: 0 0 20px rgba(255, 0, 115, 0.1);
+    box-shadow: none;
     color: var(--text-light);
 }
+
 
 h1, h2 {
     color: var(--primary-color);
@@ -259,27 +247,47 @@ textarea::placeholder {
     border-radius: 8px;
     font-weight: bold;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
     margin-top: 20px;
 }
 
 .btn-pink:hover {
     background-color: #e60065;
+    box-shadow: 0 0 8px #e60065;
 }
+
+input:focus, select:focus, .btn-pink:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  box-shadow: 0 0 6px var(--primary-color);
+}
+
 
 /* PRÉ-VISUALIZAÇÃO */
 .code-preview {
-    background-color: #f8f8f2;
-    color: #1e1e2f;
+    background-color: #2e2e3f;
+    color: #cfcfcf;
+    border: 1px solid var(--primary-color);
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid var(--primary-color);
     max-height: 400px;
     overflow-y: auto;
     white-space: pre-wrap;
     font-family: monospace;
     margin-top: 20px;
 }
+
+.code-preview::-webkit-scrollbar {
+  width: 8px;
+}
+.code-preview::-webkit-scrollbar-thumb {
+  background-color: var(--primary-color);
+  border-radius: 4px;
+}
+.code-preview::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
 
 /* Tooltips */
 .tooltip-inner {
@@ -290,6 +298,114 @@ textarea::placeholder {
     border-top-color: var(--primary-color);
 }
 
+
+#chat-widget {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    font-family: Arial, sans-serif;
+    z-index: 1000;
+  }
+
+  #chat-icon {
+    background-color: var(--primary-color);
+    color: white;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 0, 115, 0.5);
+    user-select: none;
+  }
+
+  #chat-box {
+    width: 320px;
+    height: 420px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+
+  #chat-box.hidden {
+    display: none;
+  }
+
+  #chat-header {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 12px 20px;
+    font-weight: bold;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  #close-chat {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  #chat-messages {
+    flex: 1;
+    padding: 15px 20px;
+    overflow-y: auto;
+    color: var(--text-light);
+    font-size: 14px;
+  }
+
+  #chat-messages .message {
+    margin-bottom: 12px;
+  }
+
+  #chat-messages .message.user {
+    text-align: right;
+  }
+
+  #chat-messages .message.ai {
+    text-align: left;
+  }
+
+  #chat-form {
+    display: flex;
+    border-top: 1px solid #444;
+    padding: 10px 15px;
+  }
+
+  #chat-input {
+    flex: 1;
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    background-color: #444;
+    color: white;
+  }
+
+  #chat-input::placeholder {
+    color: #bbb;
+  }
+
+  #chat-form button {
+    margin-left: 10px;
+    background-color: var(--primary-color);
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 /* -------------------- LOGIN E REGISTRO -------------------- */
 .auth-container {
     display: flex;
@@ -436,52 +552,192 @@ h2 {
   color: #fff;
 }
 
-
-/* RESPONSIVO */
-@media (max-width: 900px) {
-    .main-content {
-        padding: 80px 20px 20px 20px;
-    }
-
-    .form-area {
-        padding: 20px;
-    }
-
-    .selection-row {
-        flex-direction: column;
-    }
-
-    .sidebar-collapsible {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        justify-content: space-around;
-        left: 0 !important;
-        top: 50px;
-        padding: 10px;
-    }
-
-    .menu-icon {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 1002;
-    }
-    .auth-container {
-        flex-direction: column;
-        gap: 40px;
-        padding: 30px 20px;
-    }
-
-    .auth-left img {
-        width: 200px;
-    }
-
-    .auth-right {
-        justify-content: center;
-    }
-    .auth-box {
-        max-width: 100%;
-    }
+.inicio-container {
+  max-width: 900px;           /* mesmo max-width do content-box */
+  margin: 40px auto 80px auto; /* margem vertical mantém, horizontal centralizado */
+  background: var(--card-bg);
+  padding: 30px;              /* padding igual ao content-box (30px uniformes) */
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  text-align: center;
+  color: var(--text-light);
 }
 
+
+/* Título principal */
+.inicio-container h1 {
+  color: white;
+  margin-bottom: 25px;
+  font-size: 2.4rem;
+}
+
+/* Parágrafos */
+.inicio-container p {
+  font-size: 1.15rem;
+  margin: 0 0 28px 0;       /* margem inferior maior para espaçar do próximo bloco */
+  color: var(--text-muted);
+  line-height: 1.6;          /* melhor leitura */
+}
+
+/* Lista ordenada */
+.inicio-container ol {
+  text-align: left;
+  margin: 0 auto 35px auto;  /* margem inferior maior para separar da próxima seção */
+  max-width: 560px;          /* um pouco mais larga para aproveitar espaço */
+  font-size: 1.15rem;        /* leve aumento da fonte para facilitar leitura */
+  color: var(--text-light);
+  list-style-position: inside;
+  padding-left: 12px;        /* um leve padding para alinhar lista */
+  line-height: 1.5;          /* espaçamento entre linhas da lista */
+}
+
+/* Itens da lista */
+.inicio-container ol li {
+  margin-bottom: 16px;       /* maior espaçamento entre itens para melhor clareza */
+}
+
+/* Texto em negrito especial */
+.inicio-container strong {
+  color: var(--primary-color);
+  font-weight: 700;          /* negrito destacado */
+}
+
+
+/* === Até 900px: tablets e notebooks menores === */
+@media (max-width: 900px) {
+  .main-content {
+    padding: 60px 16px 20px;
+    gap: 24px;
+  }
+
+  .form-area,
+  .content-box,
+  .code-preview-wrapper {
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .selection-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .menu-horizontal {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 20px;
+    text-align: center;
+  }
+
+  .auth-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 20px;
+    gap: 40px;
+    transform: none;
+  }
+
+  .auth-left img {
+    width: 220px;
+  }
+
+  .auth-box {
+    max-width: 100%;
+  }
+
+  .download-item {
+    margin: 10px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn.secondary {
+    margin-left: 16px;
+  }
+
+  h2 {
+    margin-left: 16px;
+  }
+}
+
+
+/* === Dispositivos móveis (até 600px) === */
+@media (max-width: 600px) {
+  .main-content {
+    padding: 24px 12px;
+    gap: 20px;
+  }
+
+  .menu-horizontal {
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .auth-container {
+    padding: 20px 12px;
+  }
+
+  .auth-left img {
+    width: 140px;
+    margin-bottom: 0;
+  }
+
+  .selection-row {
+    flex-direction: column;
+  }
+
+  .download-item {
+    margin: 10px 12px;
+  }
+
+  .btn.secondary {
+    margin-left: 12px;
+  }
+
+  h2 {
+    margin-left: 12px;
+  }
+}
+
+
+/* === Layout para telas grandes (1400px ou mais) === */
+@media (min-width: 1400px) {
+  .main-content {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 60px 100px;
+    gap: 40px;
+    width: 100%;
+    margin: 0 auto;
+    background-color: var(--bg-color);
+  }
+
+  .form-area,
+  .content-box,
+  .code-preview-wrapper {
+    width: 100%;
+    max-width: 960px;
+    box-sizing: border-box;
+  }
+
+  .auth-container {
+    transform: none;
+    padding: 60px 100px;
+    gap: 40px;
+    justify-content: center;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .auth-box,
+  .auth-left {
+    width: 100%;
+    max-width: 480px;
+    box-sizing: border-box;
+  }
+}

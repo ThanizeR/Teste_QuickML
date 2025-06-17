@@ -6,6 +6,8 @@ from datetime import datetime
 import os
 from flask import request, jsonify
 from flask import send_from_directory
+import io
+import zipfile
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -40,18 +42,30 @@ def load_user(user_id):
 
 def generate_streamlit_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
     return f'''import streamlit as st
+import numpy as np
 from tensorflow.keras.models import load_model
 
 st.title("Model Deployment - {model_name}")
 
+# Upload do arquivo do modelo .h5
 uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
+model = None
 if uploaded_file:
     model = load_model(uploaded_file)
-    st.success("Model loaded!")
+    st.success("Model loaded successfully!")
 
+# Input numérico para o modelo
 input_number = st.number_input("Enter a numeric value")
+
 if st.button("Predict"):
-    st.write("Prediction for numeric input (exemplo)")
+    if model:
+        # Prepara o input para o modelo
+        input_data = np.array([[input_number]])
+        # Faz a predição (exemplo, ajuste conforme seu modelo)
+        prediction = model.predict(input_data)
+        st.write(f"Prediction: {{prediction[0][0]:.4f}}")
+    else:
+        st.error("Please upload a valid model first.")
 '''
 
 def generate_streamlit_h5_text_input(model_name="Keras .h5 Model with Text Input"):
@@ -61,41 +75,69 @@ from tensorflow.keras.models import load_model
 st.title("Model Deployment - {model_name}")
 
 uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
+model = None
 if uploaded_file:
     model = load_model(uploaded_file)
-    st.success("Model loaded!")
+    st.success("Model loaded successfully!")
 
 input_text = st.text_area("Enter your text here")
+
 if st.button("Predict"):
-    st.write("Prediction for text input (exemplo)")
+    if model:
+        # Aqui você pode preprocessar o texto para o modelo
+        # prediction = model.predict(preprocess(input_text))
+        prediction = "Prediction example (adjust for your model)"
+        st.write(f"Prediction: {{prediction}}")
+    else:
+        st.error("Please upload a valid model first.")
 '''
 
 def generate_streamlit_h5_image_input(model_name="Keras .h5 Model with Image Input"):
     return f'''import streamlit as st
 from tensorflow.keras.models import load_model
 from PIL import Image
+import numpy as np
 
 st.title("Model Deployment - {model_name}")
 
 uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
+model = None
 if uploaded_file:
     model = load_model(uploaded_file)
-    st.success("Model loaded!")
+    st.success("Model loaded successfully!")
 
-uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
+uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+image = None
 if uploaded_image:
     image = Image.open(uploaded_image)
     st.image(image, caption="Uploaded Image", use_column_width=True)
+
+if st.button("Predict"):
+    if model and image:
+        # Exemplo de preprocessamento e predição (ajuste conforme seu modelo)
+        # image = image.resize((224, 224))
+        # input_data = np.expand_dims(np.array(image), axis=0)
+        # prediction = model.predict(input_data)
+        prediction = "Prediction example (adjust for your model)"
+        st.write(f"Prediction: {{prediction}}")
+    elif not model:
+        st.error("Please upload a valid model first.")
+    else:
+        st.error("Please upload an image to predict.")
 '''
 
 def generate_streamlit_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
     return f'''import streamlit as st
+import numpy as np
 
 st.title("Model Deployment - {model_name}")
 
 input_number = st.number_input("Enter a numeric value")
+
 if st.button("Predict"):
-    st.write("Prediction for numeric input (exemplo)")
+    # Aqui conecte ao seu modelo ResNet para input numérico
+    prediction = 0.75  # Exemplo fake
+    st.write(f"Prediction: {{prediction:.4f}}")
 '''
 
 def generate_streamlit_resnet_text_input(model_name="ResNet Model with Text Input"):
@@ -104,8 +146,11 @@ def generate_streamlit_resnet_text_input(model_name="ResNet Model with Text Inpu
 st.title("Model Deployment - {model_name}")
 
 input_text = st.text_area("Enter your text here")
+
 if st.button("Predict"):
-    st.write("Prediction for text input (exemplo)")
+    # Aqui conecte ao seu modelo ResNet para input texto
+    prediction = "Prediction example (adjust for your model)"
+    st.write(f"Prediction: {{prediction}}")
 '''
 
 def generate_streamlit_resnet_image_input(model_name="ResNet Model with Image Input"):
@@ -114,20 +159,31 @@ from PIL import Image
 
 st.title("Model Deployment - {model_name}")
 
-uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
+uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+image = None
 if uploaded_image:
     image = Image.open(uploaded_image)
     st.image(image, caption="Uploaded Image", use_column_width=True)
+
+if st.button("Predict"):
+    # Aqui conecte ao seu modelo ResNet para input imagem
+    prediction = "Prediction example (adjust for your model)"
+    st.write(f"Prediction: {{prediction}}")
 '''
 
 def generate_streamlit_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
     return f'''import streamlit as st
+import torch
+import numpy as np
 
 st.title("Model Deployment - {model_name}")
 
 input_number = st.number_input("Enter a numeric value")
+
 if st.button("Predict"):
-    st.write("Prediction for numeric input (exemplo)")
+    # Exemplo de predição PyTorch (ajuste para seu modelo)
+    prediction = 0.88  # Valor fake
+    st.write(f"Prediction: {{prediction:.4f}}")
 '''
 
 def generate_streamlit_pytorch_text_input(model_name="PyTorch Model with Text Input"):
@@ -136,8 +192,11 @@ def generate_streamlit_pytorch_text_input(model_name="PyTorch Model with Text In
 st.title("Model Deployment - {model_name}")
 
 input_text = st.text_area("Enter your text here")
+
 if st.button("Predict"):
-    st.write("Prediction for text input (exemplo)")
+    # Exemplo de predição PyTorch texto (ajuste para seu modelo)
+    prediction = "Prediction example (adjust for your model)"
+    st.write(f"Prediction: {{prediction}}")
 '''
 
 def generate_streamlit_pytorch_image_input(model_name="PyTorch Model with Image Input"):
@@ -146,31 +205,57 @@ from PIL import Image
 
 st.title("Model Deployment - {model_name}")
 
-uploaded_image = st.file_uploader("Upload an image", type=["png","jpg","jpeg"])
+uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+image = None
 if uploaded_image:
     image = Image.open(uploaded_image)
     st.image(image, caption="Uploaded Image", use_column_width=True)
+
+if st.button("Predict"):
+    # Exemplo de predição PyTorch imagem (ajuste para seu modelo)
+    prediction = "Prediction example (adjust for your model)"
+    st.write(f"Prediction: {{prediction}}")
 '''
+
 
 # --- Funções geradoras Gradio ---
 
 def generate_gradio_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
     return f'''import gradio as gr
+import numpy as np
 from tensorflow.keras.models import load_model
 
+# Carregue seu modelo .h5 aqui (exemplo comentado)
+# model = load_model("seu_modelo.h5")
+
 def predict(number):
-    return "Prediction result (exemplo)"
+    # Converta a entrada para o formato esperado pelo modelo
+    input_data = np.array([[number]])
+    
+    # Faça a predição com o modelo carregado
+    # prediction = model.predict(input_data)
+    
+    # Exemplo de predição fake para evitar erro:
+    prediction = np.array([[0.42]])
+    
+    # Retorne o resultado formatado
+    return f"Prediction: {{prediction[0][0]:.4f}}"
 
 iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
 '''
-
 def generate_gradio_h5_text_input(model_name="Keras .h5 Model with Text Input"):
     return f'''import gradio as gr
 from tensorflow.keras.models import load_model
 
+# Carregue seu modelo .h5 (descomente e ajuste o caminho)
+# model = load_model("seu_modelo.h5")
+
 def predict(text):
-    return "Prediction result (exemplo)"
+    # Exemplo: processar texto e fazer predição
+    # prediction = model.predict(processar_texto(text))
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -179,9 +264,19 @@ iface.launch()
 def generate_gradio_h5_image_input(model_name="Keras .h5 Model with Image Input"):
     return f'''import gradio as gr
 from tensorflow.keras.models import load_model
+import numpy as np
+from PIL import Image
+
+# Carregue seu modelo .h5 (descomente e ajuste o caminho)
+# model = load_model("seu_modelo.h5")
 
 def predict(image):
-    return "Prediction result (exemplo)"
+    # Exemplo: preprocessar imagem para o modelo
+    # image = image.resize((224, 224))
+    # input_data = np.expand_dims(np.array(image), axis=0)
+    # prediction = model.predict(input_data)
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -189,9 +284,16 @@ iface.launch()
 
 def generate_gradio_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
     return f'''import gradio as gr
+import numpy as np
+
+# Carregue seu modelo ResNet (exemplo)
+# model = ...
 
 def predict(number):
-    return "Prediction result (exemplo)"
+    input_data = np.array([[number]])
+    # prediction = model.predict(input_data)
+    prediction = np.array([[0.77]])  # Exemplo fake
+    return f"Prediction: {{prediction[0][0]:.4f}}"
 
 iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -200,8 +302,13 @@ iface.launch()
 def generate_gradio_resnet_text_input(model_name="ResNet Model with Text Input"):
     return f'''import gradio as gr
 
+# Carregue seu modelo ResNet (exemplo)
+# model = ...
+
 def predict(text):
-    return "Prediction result (exemplo)"
+    # prediction = model.predict(process_text(text))
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -209,9 +316,18 @@ iface.launch()
 
 def generate_gradio_resnet_image_input(model_name="ResNet Model with Image Input"):
     return f'''import gradio as gr
+from PIL import Image
+import numpy as np
+
+# Carregue seu modelo ResNet (exemplo)
+# model = ...
 
 def predict(image):
-    return "Prediction result (exemplo)"
+    # image = image.resize((224, 224))
+    # input_data = np.expand_dims(np.array(image), axis=0)
+    # prediction = model.predict(input_data)
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -219,9 +335,20 @@ iface.launch()
 
 def generate_gradio_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
     return f'''import gradio as gr
+import torch
+import numpy as np
+
+# Carregue seu modelo PyTorch (exemplo)
+# model = torch.load("seu_modelo.pth")
+# model.eval()
 
 def predict(number):
-    return "Prediction result (exemplo)"
+    input_tensor = torch.tensor([[number]], dtype=torch.float32)
+    # with torch.no_grad():
+    #     output = model(input_tensor)
+    # prediction = output.numpy()
+    prediction = np.array([[0.88]])  # Exemplo fake
+    return f"Prediction: {{prediction[0][0]:.4f}}"
 
 iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -229,9 +356,16 @@ iface.launch()
 
 def generate_gradio_pytorch_text_input(model_name="PyTorch Model with Text Input"):
     return f'''import gradio as gr
+import torch
+
+# Carregue seu modelo PyTorch (exemplo)
+# model = torch.load("seu_modelo.pth")
+# model.eval()
 
 def predict(text):
-    return "Prediction result (exemplo)"
+    # prediction = model(process_text(text))
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
@@ -239,12 +373,105 @@ iface.launch()
 
 def generate_gradio_pytorch_image_input(model_name="PyTorch Model with Image Input"):
     return f'''import gradio as gr
+import torch
+from PIL import Image
+import numpy as np
+
+# Carregue seu modelo PyTorch (exemplo)
+# model = torch.load("seu_modelo.pth")
+# model.eval()
 
 def predict(image):
-    return "Prediction result (exemplo)"
+    # image = image.resize((224, 224))
+    # input_tensor = transform(image).unsqueeze(0)
+    # with torch.no_grad():
+    #     output = model(input_tensor)
+    # prediction = output.numpy()
+    prediction = "resultado de predição (exemplo)"  # Exemplo fake
+    return f"Prediction: {{prediction}}"
 
 iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
 iface.launch()
+'''
+def generate_requirements(framework):
+    if framework == "streamlit":
+        return "streamlit\ntensorflow\npillow"
+    else:
+        return "gradio\ntensorflow\npillow"
+
+def generate_usage_header(framework, model_name):
+    if framework == "streamlit":
+        run_cmd = "streamlit run nome_do_arquivo.py"
+        install_cmd = "pip install streamlit tensorflow pillow"
+        deploy_section = f"""
+☁️ 4. Deploy na Nuvem:
+
+🌐 Streamlit Cloud (https://streamlit.io/cloud):
+   - Acesse o site e faça login com sua conta GitHub;
+   - Clique em 'New App' e selecione o repositório com este código;
+   - No campo "Main file path", indique: `nome_do_arquivo.py`;
+   - Certifique-se de ter um arquivo `requirements.txt` no repositório com as dependências;
+   - Clique em "Deploy" e pronto!
+
+📌 Dica:
+   - Streamlit Cloud é ideal para apps interativos com UI direta no navegador;
+   - Permite atualizações automáticas a partir do GitHub.
+"""
+        deploy_note = "📌 Ideal para dashboards interativos com interface rápida e visual."
+    else:
+        run_cmd = "python nome_do_arquivo.py"
+        install_cmd = "pip install gradio tensorflow pillow"
+        deploy_section = f"""
+☁️ 4. Deploy na Nuvem:
+
+🤗 Hugging Face Spaces (https://huggingface.co/spaces):
+   - Acesse o site e faça login;
+   - Clique em "Create New Space";
+   - Escolha o SDK: `Gradio`;
+   - Preencha nome e visibilidade do projeto;
+   - Faça upload deste script (`nome_do_arquivo.py`) e do `requirements.txt`;
+   - O arquivo será executado automaticamente se contiver:
+     ```python
+     import gradio as gr
+     ...
+     interface.launch()
+     ```
+   - Após o deploy, seu app estará acessível publicamente via URL.
+
+📌 Dica:
+   - Hugging Face Spaces é ideal para deploys rápidos e gratuitos com Gradio;
+   - Excelente para demonstração de modelos de IA com inputs customizados.
+"""
+        deploy_note = "📌 Ideal para APIs visuais simples e publicação fácil via Hugging Face Spaces."
+
+    return f'''"""
+📦 Instruções de Uso - {model_name}
+
+Este código foi gerado automaticamente pelo QuickML Creator utilizando o framework: {framework.upper()}.
+{deploy_note}
+
+🔧 1. Instale as dependências:
+   {install_cmd}
+
+▶️ 2. Execute localmente:
+   {run_cmd}
+
+🧠 3. Como usar:
+   - Faça upload do seu modelo (ex: .h5, .pt);
+   - Insira os dados conforme o tipo de entrada (imagem, texto ou número);
+   - Veja os resultados da predição diretamente na interface.
+
+{deploy_section}
+
+📁 Arquivo principal: nome_do_arquivo.py
+"""
+‼️ Agora siga com o seu código para gerar a aplicação web desejada.
+
+Este arquivo serve como ponto de partida. Implemente a lógica do seu modelo, as funções de predição e a interface de usuário conforme o framework escolhido.
+
+Explore os recursos do Streamlit ou Gradio para criar uma experiência interativa e intuitiva para seu projeto de machine learning.
+
+Boa codificação! 🚀
 '''
 
 # --- Função para escolher a função geradora correta ---
@@ -280,14 +507,20 @@ def generate_code(framework, model_type, data_type, model_name):
     generator = mapping.get(key)
     if not generator:
         return f"# Combinação não suportada: {key}"
-    return generator(model_name)
+    header = generate_usage_header(framework, model_name)
+    body = generator(model_name)
+    return header + "\n\n" + body
+
 
 # --- Routes ---
 
 @app.route('/')
-@login_required
 def index():
-    return render_template('wizard_preview.html')
+    return render_template('inicio.html', active_page='index')
+
+@app.route('/gerar_codigo')
+def wizard_preview():
+    return render_template('wizard_preview.html', active_page='wizard_preview')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():

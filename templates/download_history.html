@@ -8,10 +8,11 @@
 <body>
     <div class="container">
         <nav class="menu-horizontal">
-            <a href="{{ url_for('index') }}">🏠 Início</a>
-            <a href="{{ url_for('download_history') }}"  class="active">⬇️ Downloads</a>
-            <a href="{{ url_for('logout') }}">⎋ Logout</a>
-        </nav>
+        <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
+        <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
+        <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
+        <a href="{{ url_for('logout') }}">⎋ Logout</a>
+    </nav>
         <h2 class="page-title">Histórico de Downloads</h1>
 
         {% if downloads %}

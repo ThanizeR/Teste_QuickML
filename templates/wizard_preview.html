@@ -35,10 +35,11 @@
 <body>
 <!-- MENU HORIZONTAL -->
 <nav class="menu-horizontal">
-    <a href="{{ url_for('index') }}" class="active">🏠 Início</a>
-    <a href="{{ url_for('download_history') }}">⬇️ Downloads</a>
-    <a href="{{ url_for('logout') }}">⎋ Logout</a>
-</nav>
+        <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
+        <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
+        <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
+        <a href="{{ url_for('logout') }}">⎋ Logout</a>
+    </nav>
 
 <!-- CONTEÚDO PRINCIPAL -->
 <div class="main-content">
@@ -112,13 +113,23 @@
                     <input type="hidden" name="model_name" id="hiddenModelName">
                     <button type="submit" class="btn-pink" id="downloadBtn">Download</button>
                 </form>
-                <div class="custom-progress-container">
-                    <div id="progressBar" class="custom-progress-bar">
-                        <!-- Texto atualizado pelo JS -->
-                    </div>
-                </div>
             </div>
+        </div>
+        <!-- Botão do chat -->
+        <div id="chat-widget">
+        <div id="chat-icon">💬</div>
 
+        <div id="chat-box" class="hidden">
+            <div id="chat-header">
+            <span>Dúvidas? Pergunte aqui!</span>
+            <button id="close-chat">&times;</button>
+            </div>
+            <div id="chat-messages"></div>
+            <form id="chat-form">
+            <input type="text" id="chat-input" placeholder="Digite sua pergunta..." autocomplete="off" />
+            <button type="submit">Enviar</button>
+            </form>
+        </div>
         </div>
     </div>
 </div>
@@ -163,7 +174,7 @@
                 const result = await response.json();
                 preview.textContent = result.code;
             } else {
-                preview.textContent = 'Erro ao carregar pré-visualização.';
+                preview.textContent = '⚠️ Ocorreu um erro ao gerar a visualização. Preencha todos os campos acima!';
             }
         } catch (err) {
             console.error(err);
@@ -188,55 +199,110 @@
         });
     });
 
-    // Atualização da barra de progresso (etapas 1 a 5)
-    function updateProgressBar() {
-        const formData = new FormData(form);
-        let step = 1;
+</script>
 
-        if (formData.get('framework')) step++;
-        if (formData.get('model_type') && formData.get('model_type') !== '') step++;
-        if (formData.get('model_name')) step++;
-        if (formData.get('data_type') && formData.get('data_type') !== '') step++;
+<script>
+  // Código do chat
+  const chatIcon = document.getElementById('chat-icon');
+  const chatBox = document.getElementById('chat-box');
+  const closeChat = document.getElementById('close-chat');
+  const chatForm = document.getElementById('chat-form');
+  const chatInput = document.getElementById('chat-input');
+  const chatMessages = document.getElementById('chat-messages');
 
-        const percent = (step / 5) * 100;
-        const progressBar = document.getElementById('progressBar');
-        progressBar.style.width = percent + "%";
-        progressBar.style.backgroundColor = '#007bff'; // azul padrão
-        progressBar.textContent = `Etapa ${step} de 5`;
+  // FAQs com respostas detalhadas
+  const faqs = [
+    {
+      keywords: ['criar código', 'gerar código', 'como criar código', 'fazer código'],
+      answer: 'Para criar um código, selecione a linguagem desejada, defina os parâmetros e clique em "Gerar". O sistema vai fornecer o código automaticamente.'
+    },
+    {
+      keywords: ['funcionamento', 'como funciona', 'o que é isso', 'explicação'],
+      answer: 'Este gerador utiliza inteligência artificial para criar códigos baseados nas suas instruções. Basta preencher o formulário e receber o código pronto para uso.'
+    },
+    {
+      keywords: ['suporte', 'ajuda', 'dúvidas', 'contato'],
+      answer: 'Se precisar de ajuda adicional, entre em contato pelo e-mail suporte@seusite.com ou pelo chat aqui mesmo.'
+    },
+    {
+      keywords: ['template', 'modelo', 'exemplo de código'],
+      answer: 'Você pode escolher entre vários templates pré-definidos no menu para facilitar a criação do seu projeto.'
+    },
+    {
+      keywords: ['deploy streamlit', 'como fazer deploy streamlit', 'deploy com streamlit', 'publicar streamlit', 'colocar streamlit no ar'],
+      answer: `Para realizar o deploy de uma aplicação feita com Streamlit, você pode usar o **Streamlit Cloud**, que é gratuito e muito fácil:
+
+        1. Crie uma conta no https://streamlit.io/cloud.
+        2. Conecte seu repositório do GitHub que contém seu app Streamlit.
+        3. Configure o nome do arquivo principal (ex: app.py) e a branch.
+        4. Configure seu arquivo requirements.txt, basicamente uma lista de todas as bibliotecas e pacotes Python que seu projeto precisa para funcionar corretamente, por exemplo: 
+        streamlit==1.20.0
+        numpy>=1.23.0
+        pandas
+        gradio
+        5. Clique em deploy e sua aplicação estará online com uma URL pública.`
+    },
+    {
+      keywords: ['deploy gradio', 'como fazer deploy gradio', 'deploy com gradio', 'publicar gradio', 'colocar gradio no ar'],
+      answer: `Para publicar seu app Gradio na internet, uma das formas mais simples é usar o **Hugging Face Spaces**:
+
+        1. Crie um repositório no https://huggingface.co/spaces e selecione "Gradio" como tipo.
+        2. Suba seu código Python com o app Gradio para esse repositório.
+        3. Configure seu arquivo requirements.txt, basicamente uma lista de todas as bibliotecas e pacotes Python que seu projeto precisa para funcionar corretamente, por exemplo: 
+        streamlit==1.20.0
+        numpy>=1.23.0
+        pandas
+        gradio
+        4. O Hugging Face automaticamente vai rodar e hospedar seu app, que ficará acessível via URL pública.`
     }
+  ];
 
-    form.addEventListener('change', () => {
-        updatePreview();
-        updateProgressBar();
-    });
+  chatIcon.addEventListener('click', () => {
+    chatBox.classList.toggle('hidden');
+    if (!chatBox.classList.contains('hidden')) {
+      chatInput.focus();
+    }
+  });
 
-    form.addEventListener('input', () => {
-        updatePreview();
-        updateProgressBar();
-    });
+  closeChat.addEventListener('click', () => {
+    chatBox.classList.add('hidden');
+  });
 
-    window.addEventListener('load', () => {
-        updatePreview();
-        updateProgressBar();
-    });
+  chatForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const userMessage = chatInput.value.trim();
+    if (!userMessage) return;
 
-    // Ao clicar em Download, anima barra para verde e texto "Concluído!" antes de submeter o formulário
-    const downloadBtn = document.getElementById('downloadBtn');
-    const progressBar = document.getElementById('progressBar');
+    addMessage(userMessage, 'user');
+    chatInput.value = '';
+    chatInput.disabled = true;
 
-    downloadBtn.addEventListener('click', function(event) {
-        event.preventDefault(); // impede envio imediato
+    const response = getFAQResponse(userMessage.toLowerCase());
+    setTimeout(() => {
+      addMessage(response, 'ai');
+      chatInput.disabled = false;
+      chatInput.focus();
+    }, 1000);
+  });
 
-        // Anima a barra para 100% e verde
-        progressBar.style.width = '100%';
-        progressBar.style.backgroundColor = '#28a745'; // verde
-        progressBar.textContent = 'Concluído!';
+  function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender);
+    msgDiv.textContent = text;
+    chatMessages.appendChild(msgDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
 
-        // Envia o formulário após 2 segundos
-        setTimeout(() => {
-            event.target.form.submit();
-        }, 2000);
-    });
+  function getFAQResponse(text) {
+    for (const faq of faqs) {
+      for (const keyword of faq.keywords) {
+        if (text.includes(keyword)) {
+          return faq.answer;
+        }
+      }
+    }
+    return 'Desculpe, não entendi sua pergunta. Tente reformular ou consulte o suporte.';
+  }
 </script>
 
 </body>
