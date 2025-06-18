@@ -8,6 +8,8 @@ from flask import request, jsonify
 from flask import send_from_directory
 import io
 import zipfile
+from flask import request, redirect, url_for, flash, send_file
+from io import BytesIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -474,7 +476,6 @@ Explore os recursos do Streamlit ou Gradio para criar uma experiência interativ
 Boa codificação! 🚀
 '''
 
-# --- Função para escolher a função geradora correta ---
 
 def generate_code(framework, model_type, data_type, model_name):
     key = f"{model_type}_{data_type}"
@@ -503,16 +504,44 @@ def generate_code(framework, model_type, data_type, model_name):
             'pytorch_text_input': generate_gradio_pytorch_text_input,
             'pytorch_image_input': generate_gradio_pytorch_image_input,
         }
-
     generator = mapping.get(key)
     if not generator:
         return f"# Combinação não suportada: {key}"
-    header = generate_usage_header(framework, model_name)
-    body = generator(model_name)
-    return header + "\n\n" + body
+    return generator(model_name)
+
+import zipfile
+import os
+
+def save_zip(framework, model_type, data_type, model_name, zip_path="app_package.zip"):
+    # 1. Conteúdo dos arquivos
+    code = generate_code(framework, model_type, data_type, model_name)
+    readme = generate_usage_header(framework, model_name)
+    requirements = generate_requirements(framework)
+
+    # 2. Criação dos arquivos temporários
+    with open("app.py", "w", encoding="utf-8") as f:
+        f.write(code)
+    with open("requirements.txt", "w", encoding="utf-8") as f:
+        f.write(requirements)
+    with open("README.txt", "w", encoding="utf-8") as f:
+        f.write(readme)
+
+    # 3. Compactar em .zip
+    with zipfile.ZipFile(zip_path, 'w') as zipf:
+        zipf.write("app.py")
+        zipf.write("requirements.txt")
+        zipf.write("README.txt")
+
+    # 4. Limpeza dos arquivos temporários (opcional)
+    os.remove("app.py")
+    os.remove("requirements.txt")
+    os.remove("README.txt")
+
+    return zip_path
 
 
 # --- Routes ---
+
 
 @app.route('/')
 def index():
@@ -593,17 +622,31 @@ def generate_code_route():
         flash("Por favor, preencha todos os campos.", "danger")
         return redirect(request.referrer or url_for('index'))
 
-    code = generate_code(framework, model_type, data_type, model_name)
-    filename = f"{framework}_{model_type}_{data_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.py"
+    # Gerar os conteúdos dos 3 arquivos
+    code = generate_code(framework, model_type, data_type, model_name)  # apenas o código principal
+    readme = generate_usage_header(framework, model_name)  # instruções
+    requirements = generate_requirements(framework)  # dependências
 
+    # Nome do arquivo zip
+    zip_filename = f"{framework}_{model_type}_{data_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
+
+    # Criar o zip em memória
+    memory_file = BytesIO()
+    with zipfile.ZipFile(memory_file, 'w') as zf:
+        zf.writestr("app.py", code)
+        zf.writestr("README.txt", readme)
+        zf.writestr("requirements.txt", requirements)
+    memory_file.seek(0)
+
+    # Salvar zip no diretório de downloads
     downloads_dir = os.path.join(app.root_path, 'downloads')
     os.makedirs(downloads_dir, exist_ok=True)
-    file_path = os.path.join(downloads_dir, filename)
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(code)
+    file_path = os.path.join(downloads_dir, zip_filename)
+    with open(file_path, 'wb') as f:
+        f.write(memory_file.getvalue())
 
-    # Salvar referência ao download no banco de dados
-    download_entry = Download(filename=filename, user_id=current_user.id)
+    # Registrar no banco de dados
+    download_entry = Download(filename=zip_filename, user_id=current_user.id)
     db.session.add(download_entry)
     db.session.commit()
 

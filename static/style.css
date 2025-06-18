@@ -414,8 +414,13 @@ input:focus, select:focus, .btn-pink:focus {
     min-height: 100vh;
     padding: 40px 80px;
     gap: 80px;
-    transform: translateX(13%); /* ✅ MOVE tudo para a direita */
 }
+
+.auth-container,
+.auth-container.registro {
+  transform: none;
+}
+
 .auth-left {
     display: flex;
     flex-direction: column;
@@ -502,9 +507,6 @@ button.btn-rosa:hover, button.btn-pink:hover {
     color: var(--primary-color);
 }
 
-.auth-container.registro {
-    transform: translateX(13%); /* deslocamento menor que o login */
-}
 
 .download-list {
   list-style: none;
@@ -603,82 +605,58 @@ h2 {
 }
 
 
-/* === Até 900px: tablets e notebooks menores === */
+/* === Telas até 900px: tablets e notebooks menores === */
 @media (max-width: 900px) {
-  .main-content {
-    padding: 60px 16px 20px;
-    gap: 24px;
-  }
-
-  .form-area,
-  .content-box,
-  .code-preview-wrapper {
-    padding: 20px;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  .selection-row {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .menu-horizontal {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 16px;
-    padding: 12px 20px;
-    text-align: center;
-  }
-
   .auth-container {
     flex-direction: column;
     align-items: center;
-    padding: 32px 20px;
-    gap: 40px;
+    justify-content: center;
     transform: none;
+    padding: 40px 30px;
+    gap: 40px;
+    min-height: 100vh;
   }
 
   .auth-left img {
-    width: 220px;
+    width: 280px; /* Aumentado de 200px para 280px */
   }
 
   .auth-box {
-    max-width: 100%;
+    max-width: 600px;  /* Aumentado o limite */
+    width: 100%;
+    padding: 32px;      /* Levemente aumentado */
   }
 
-  .download-item {
-    margin: 10px 16px;
-    flex-direction: column;
-    align-items: flex-start;
+  input, select, .form-control {
+    font-size: 1rem;
+    padding: 14px;
   }
 
-  .btn.secondary {
-    margin-left: 16px;
+  .auth-box h2 {
+    font-size: 1.8rem;
   }
 
-  h2 {
-    margin-left: 16px;
+  .auth-left .quote {
+    font-size: 1.2rem;
+  }
+
+  button.btn-rosa, button.btn-pink {
+    font-size: 1rem;
+    padding: 14px;
   }
 }
 
 
-/* === Dispositivos móveis (até 600px) === */
+/* === Telas até 600px: celulares === */
 @media (max-width: 600px) {
-  .main-content {
-    padding: 24px 12px;
-    gap: 20px;
-  }
-
-  .menu-horizontal {
+  .auth-container {
     flex-direction: column;
     align-items: center;
-    gap: 12px;
-    padding: 12px;
-  }
-
-  .auth-container {
+    justify-content: center;
+    transform: none;
     padding: 20px 12px;
+    gap: 24px;
+    min-height: 100vh;
   }
 
   .auth-left img {
@@ -686,58 +664,42 @@ h2 {
     margin-bottom: 0;
   }
 
-  .selection-row {
-    flex-direction: column;
-  }
-
-  .download-item {
-    margin: 10px 12px;
-  }
-
-  .btn.secondary {
-    margin-left: 12px;
-  }
-
-  h2 {
-    margin-left: 12px;
+  .auth-box {
+    max-width: 100%;
+    width: 100%;
   }
 }
 
-
-/* === Layout para telas grandes (1400px ou mais) === */
-@media (min-width: 1400px) {
-  .main-content {
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    padding: 60px 100px;
-    gap: 40px;
-    width: 100%;
-    margin: 0 auto;
-    background-color: var(--bg-color);
+/* === Telas grandes: acima de 900px === */
+@media (min-width: 901px) {
+  .auth-left img {
+    width: 380px; /* Aumenta imagem */
   }
 
-  .form-area,
-  .content-box,
-  .code-preview-wrapper {
-    width: 100%;
-    max-width: 960px;
-    box-sizing: border-box;
+  .auth-left .quote {
+    font-size: 1.6rem;
   }
 
-  .auth-container {
-    transform: none;
-    padding: 60px 100px;
-    gap: 40px;
-    justify-content: center;
-    width: 100%;
-    margin: 0 auto;
+  .auth-box {
+    padding: 50px;
+    max-width: 500px;
   }
 
-  .auth-box,
-  .auth-left {
-    width: 100%;
-    max-width: 480px;
-    box-sizing: border-box;
+  .auth-box h2 {
+    font-size: 2.2rem;
+  }
+
+  input, select, .form-control {
+    font-size: 1.1rem;
+    padding: 16px;
+  }
+
+  button.btn-rosa, button.btn-pink {
+    font-size: 1.05rem;
+    padding: 16px 24px;
+  }
+
+  .link-secundario {
+    font-size: 1rem;
   }
 }
