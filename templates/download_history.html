@@ -1,36 +1,103 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>{% block title %}Histórico de Downloads{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
 </head>
 <body>
-    <div class="container">
-        <nav class="menu-horizontal">
+    <nav class="menu-horizontal">
         <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
         <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
         <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
         <a href="{{ url_for('logout') }}">⎋ Logout</a>
     </nav>
-        <h2 class="page-title">Histórico de Downloads</h1>
+
+    <main class="main-content container">
 
         {% if downloads %}
-            <ul class="download-list">
-                {% for d in downloads %}
-                    <li class="download-item">
-                        <span>
-                            {{ d.timestamp.strftime("%Y-%m-%d %H:%M:%S") }} — {{ d.filename }}
-                        </span>
-                        <a href="{{ url_for('download_file', filename=d.filename) }}" class="btn">Download</a>
-                    </li>
-                {% endfor %}
-            </ul>
+        <section class="download-section content-box">
+            <div style="text-align: center; margin: 20px 0;">
+                <img src="{{ url_for('static', filename='logo2 vertical.png') }}" alt="Logo" class="top-logo" />
+            </div>
+            <h2 class="page-title">Histórico de Downloads</h2>
+          <ul id="downloadList" class="download-list">
+              {% for d in downloads %}
+              <li class="download-item">
+                  <span class="download-info">
+                      {{ d.timestamp.strftime("%d/%m/%Y - %H:%M") }} — {{ d.filename }}
+                  </span>
+                  <a href="{{ url_for('download_file', filename=d.filename) }}" class="btn btn-pink btn-sm" aria-label="Baixar {{ d.filename }}">Download</a>
+              </li>
+              {% endfor %}
+          </ul>
+
+          <div class="pagination-buttons">
+            <button id="prevPage" class="btn btn-secondary btn-sm" disabled aria-label="Página anterior">Anterior</button>
+
+            <label for="itemsPerPage" class="items-per-page-label">Itens por página:</label>
+            <select id="itemsPerPage" aria-label="Itens por página">
+              <option value="10" selected>10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+            </select>
+
+            <span id="pageInfo" aria-live="polite" aria-atomic="true">Página 1</span>
+            <button id="nextPage" class="btn btn-secondary btn-sm" aria-label="Próxima página">Próximo</button>
+          </div>
+
+        </section>
         {% else %}
-            <p>Nenhum download encontrado.</p>
+        <p class="no-downloads-message">Nenhum download encontrado.</p>
         {% endif %}
 
-        <a href="{{ url_for('index') }}" class="btn secondary mt-4">Voltar</a>
-    </div>
+    </main>
+
+    <script>
+      const downloadList = document.getElementById('downloadList');
+      const itemsPerPageSelect = document.getElementById('itemsPerPage');
+      const prevBtn = document.getElementById('prevPage');
+      const nextBtn = document.getElementById('nextPage');
+      const pageInfo = document.getElementById('pageInfo');
+
+      let currentPage = 1;
+      let itemsPerPage = parseInt(itemsPerPageSelect.value);
+      const items = Array.from(downloadList.children);
+      const totalItems = items.length;
+
+      function showPage(page) {
+        currentPage = page;
+        const start = (page -1) * itemsPerPage;
+        const end = start + itemsPerPage;
+
+        items.forEach((item, index) => {
+          item.style.display = (index >= start && index < end) ? 'flex' : 'none';
+        });
+
+        pageInfo.textContent = `Página ${currentPage} de ${Math.ceil(totalItems / itemsPerPage)}`;
+        prevBtn.disabled = currentPage === 1;
+        nextBtn.disabled = currentPage >= Math.ceil(totalItems / itemsPerPage);
+      }
+
+      itemsPerPageSelect.addEventListener('change', () => {
+        itemsPerPage = parseInt(itemsPerPageSelect.value);
+        showPage(1);
+      });
+
+      prevBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+          showPage(currentPage - 1);
+        }
+      });
+
+      nextBtn.addEventListener('click', () => {
+        if (currentPage < Math.ceil(totalItems / itemsPerPage)) {
+          showPage(currentPage + 1);
+        }
+      });
+
+      // Inicializa exibindo a primeira página
+      showPage(1);
+    </script>
 </body>
 </html>

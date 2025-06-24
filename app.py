@@ -1,15 +1,13 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_from_directory, send_file
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 import os
-from flask import request, jsonify
-from flask import send_from_directory
-import io
-import zipfile
-from flask import request, redirect, url_for, flash, send_file
+import pytz
 from io import BytesIO
+import zipfile
+from pytz import timezone, utc
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
@@ -32,13 +30,12 @@ class User(UserMixin, db.Model):
 class Download(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.String(200))
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    timestamp = db.Column(db.DateTime, default=lambda: datetime.now(pytz.timezone("America/Sao_Paulo")))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
 # --- Wizard code generation functions ---
 
 
@@ -548,28 +545,36 @@ def index():
     return render_template('inicio.html', active_page='index')
 
 @app.route('/gerar_codigo')
+@login_required
 def wizard_preview():
     return render_template('wizard_preview.html', active_page='wizard_preview')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        username = request.form.get('username').strip()
-        email = request.form.get('email').strip()
-        password = request.form.get('password')
+        username = request.form['username'].strip()
+        email = request.form['email'].strip()
+        password = request.form['password']
+        confirm_password = request.form['confirm_password']
 
+        # Exemplo no registro
         if User.query.filter_by(username=username).first():
-            flash("Username already exists", "danger")
-            return redirect(url_for('register'))
-        if User.query.filter_by(email=email).first():
-            flash("Email already registered", "danger")
-            return redirect(url_for('register'))
+            flash("Nome de usuário já existe", "danger")
+        elif User.query.filter_by(email=email).first():
+            flash("E-mail já registrado", "danger")
+        elif password != confirm_password:
+            flash("As senhas não coincidem", "warning")
+        else:
+            # salvar usuário
+            flash("Conta criada com sucesso! Faça login.", "success")
 
-        new_user = User(username=username, email=email,
-                        password=generate_password_hash(password, method='pbkdf2:sha256'))
+        # Criar usuário
+        hashed_password = generate_password_hash(password, method='sha256')
+        new_user = User(username=username, email=email, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        flash("Registered successfully! Please log in.", "success")
+
+        flash("Conta criada com sucesso! Faça login.", "success")
         return redirect(url_for('login'))
 
     return render_template('register.html')
@@ -577,16 +582,19 @@ def register():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form.get('username').strip()
+        username = request.form.get('username', '').strip()
         password = request.form.get('password')
 
         user = User.query.filter_by(username=username).first()
-        if not user or not check_password_hash(user.password, password):
-            flash("Invalid credentials", "danger")
-            return redirect(url_for('login'))
 
-        login_user(user)
-        return redirect(url_for('index'))
+        if not user:
+            flash("Usuário não encontrado", "danger")
+        elif not check_password_hash(user.password, password):
+            flash("Senha incorreta", "danger")
+        else:
+            login_user(user)
+            flash("Login realizado com sucesso", "success")
+            return redirect(url_for('index'))
 
     return render_template('login.html')
 
@@ -602,13 +610,11 @@ def logout():
 def profile():
     return render_template('profile.html', user=current_user)
 
-from flask import send_from_directory
-
 @app.route('/download/<filename>')
 @login_required
 def download_file(filename):
-    return send_from_directory('downloads', filename, as_attachment=True)
-
+    downloads_dir = os.path.join(app.root_path, 'downloads')
+    return send_from_directory(downloads_dir, filename, as_attachment=True)
 
 @app.route('/generate_code', methods=['POST'])
 @login_required
@@ -620,17 +626,17 @@ def generate_code_route():
 
     if not all([framework, model_type, data_type, model_name]):
         flash("Por favor, preencha todos os campos.", "danger")
-        return redirect(request.referrer or url_for('index'))
+        return redirect(request.referrer or url_for('wizard_preview'))
 
-    # Gerar os conteúdos dos 3 arquivos
-    code = generate_code(framework, model_type, data_type, model_name)  # apenas o código principal
-    readme = generate_usage_header(framework, model_name)  # instruções
-    requirements = generate_requirements(framework)  # dependências
+    # Gerar arquivos
+    code = generate_code(framework, model_type, data_type, model_name)
+    readme = generate_usage_header(framework, model_name)
+    requirements = generate_requirements(framework)
 
-    # Nome do arquivo zip
+    # Nome do ZIP
     zip_filename = f"{framework}_{model_type}_{data_type}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.zip"
 
-    # Criar o zip em memória
+    # Criar em memória
     memory_file = BytesIO()
     with zipfile.ZipFile(memory_file, 'w') as zf:
         zf.writestr("app.py", code)
@@ -638,20 +644,29 @@ def generate_code_route():
         zf.writestr("requirements.txt", requirements)
     memory_file.seek(0)
 
-    # Salvar zip no diretório de downloads
+    # Salvar fisicamente para histórico
     downloads_dir = os.path.join(app.root_path, 'downloads')
     os.makedirs(downloads_dir, exist_ok=True)
     file_path = os.path.join(downloads_dir, zip_filename)
     with open(file_path, 'wb') as f:
         f.write(memory_file.getvalue())
 
-    # Registrar no banco de dados
-    download_entry = Download(filename=zip_filename, user_id=current_user.id)
+    # Hora em fuso de São Paulo
+    br_tz = pytz.timezone('America/Sao_Paulo')
+    now_br = datetime.now(br_tz)
+
+    # Registrar no banco com horário correto
+    download_entry = Download(filename=zip_filename, user_id=current_user.id, timestamp=now_br)
     db.session.add(download_entry)
     db.session.commit()
 
-    flash("Código gerado e salvo!", "success")
-    return redirect(url_for('download_history'))
+    # Retornar como download para o navegador (automático)
+    return send_file(
+        memory_file,
+        mimetype='application/zip',
+        download_name=zip_filename,
+        as_attachment=True
+    )
 
 @app.route('/preview_code', methods=['POST'])
 def preview_code():
@@ -667,16 +682,24 @@ def preview_code():
     code = generate_code(framework, model_type, data_type, model_name)
     return jsonify({'code': code})
 
-
 @app.route('/download_history')
 @login_required
 def download_history():
     downloads = Download.query.filter_by(user_id=current_user.id).order_by(Download.timestamp.desc()).all()
+    tz_sp = timezone("America/Sao_Paulo")
+
+    for d in downloads:
+        if d.timestamp is not None:
+            if d.timestamp.tzinfo is None:
+                # Marca como UTC e converte para São Paulo
+                d.timestamp = utc.localize(d.timestamp).astimezone(tz_sp)
+            else:
+                # Se já tiver timezone, converte para São Paulo
+                d.timestamp = d.timestamp.astimezone(tz_sp)
+
     return render_template('download_history.html', downloads=downloads)
 
 # --- Run ---
-
-# Armazena as mensagens em memória (apenas para demonstração)
 chat_messages = []
 
 @app.route('/chat', methods=['GET', 'POST'])
@@ -686,7 +709,6 @@ def chat():
     if request.method == 'POST':
         message = request.form.get('message')
         if message:
-            # Adiciona a mensagem ao chat com username e timestamp
             chat_messages.append({
                 'user': current_user.username,
                 'message': message,
@@ -695,7 +717,6 @@ def chat():
         return redirect(url_for('chat'))
 
     return render_template('chat.html', messages=chat_messages)
-
 
 if __name__ == '__main__':
     with app.app_context():

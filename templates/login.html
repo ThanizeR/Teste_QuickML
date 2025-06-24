@@ -6,14 +6,28 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+
 <div class="auth-container">
     <div class="auth-left">
         <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" class="logo">
         <p class="quote">A tecnologia não precisa parecer uma língua diferente</p>
     </div>
+
     <div class="auth-right">
         <div class="auth-box">
             <h2>Login</h2>
+
+            <!-- Bloco para exibir mensagens -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% if messages %}
+                <div class="flash-container">
+                  {% for category, message in messages %}
+                    <div class="flash-message flash-{{ category }}">{{ message }}</div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+            {% endwith %}
+
             <form method="POST">
                 <input type="text" name="username" placeholder="Usuário" required>
                 <input type="password" name="password" placeholder="Senha" required>
@@ -23,5 +37,6 @@
         </div>
     </div>
 </div>
+
 </body>
 </html>

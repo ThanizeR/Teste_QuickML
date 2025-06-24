@@ -5,41 +5,15 @@
     <title>Gerar Código</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-
-    <style>
-        .custom-progress-container {
-            background-color: #eee;
-            border-radius: 6px;
-            height: 24px;
-            overflow: hidden;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
-            flex-grow: 1;
-            max-width: 200px;
-        }
-
-        .custom-progress-bar {
-            height: 100%;
-            width: 0%;
-            background-color: #007bff; /* azul padrão */
-            color: white;
-            text-align: center;
-            line-height: 24px;
-            font-weight: 600;
-            transition: width 0.4s ease, background-color 0.4s ease;
-            border-radius: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-        }
-    </style>
 </head>
 <body>
 <!-- MENU HORIZONTAL -->
 <nav class="menu-horizontal">
-        <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
-        <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
-        <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
-        <a href="{{ url_for('logout') }}">⎋ Logout</a>
-    </nav>
+    <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
+    <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
+    <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
+    <a href="{{ url_for('logout') }}">⎋ Logout</a>
+</nav>
 
 <!-- CONTEÚDO PRINCIPAL -->
 <div class="main-content">
@@ -50,20 +24,15 @@
             </div>
 
             <form id="codeForm">
-                <!-- Linha 1: Framework + Tipo de Modelo -->
+                <!-- Linha 1 -->
                 <div class="selection-row">
                     <div class="selection-item radio-group">
-                        <label class="form-label">
-                            <span data-bs-toggle="tooltip" title="Selecione o framework que deseja usar.">Framework:</span>
-                        </label>
+                        <label class="form-label">Framework:</label>
                         <label><input type="radio" name="framework" value="streamlit" checked> Streamlit</label>
                         <label><input type="radio" name="framework" value="gradio"> Gradio</label>
                     </div>
-
                     <div class="selection-item">
-                        <label class="form-label">
-                            <span data-bs-toggle="tooltip" title="Tipo de modelo a ser utilizado.">Tipo de Modelo:</span>
-                        </label>
+                        <label class="form-label">Tipo de Modelo:</label>
                         <select name="model_type" class="form-select" required>
                             <option value="" disabled selected>Selecione o tipo de modelo</option>
                             <option value="h5">Keras .h5</option>
@@ -73,19 +42,14 @@
                     </div>
                 </div>
 
-                <!-- Linha 2: Nome + Tipo de Dados -->
+                <!-- Linha 2 -->
                 <div class="selection-row">
                     <div class="selection-item">
-                        <label class="form-label">
-                            <span data-bs-toggle="tooltip" title="Nome personalizado para seu modelo.">Nome do Modelo:</span>
-                        </label>
+                        <label class="form-label">Nome do Modelo:</label>
                         <input type="text" name="model_name" class="form-control" placeholder="Meu Modelo" required>
                     </div>
-
                     <div class="selection-item">
-                        <label class="form-label">
-                            <span data-bs-toggle="tooltip" title="Tipo de entrada de dados para o modelo.">Tipo de Dados:</span>
-                        </label>
+                        <label class="form-label">Tipo de Dados:</label>
                         <select name="data_type" class="form-select" required>
                             <option value="" disabled selected>Selecione o tipo de dado</option>
                             <option value="image_input">Imagem</option>
@@ -97,39 +61,52 @@
             </form>
 
             <h2>Pré-visualização do Código</h2>
-            <div class="code-preview-wrapper" style="position: relative;">
-                <button id="copyBtn" class="btn btn-sm btn-outline-secondary" style="position: absolute; top: 10px; right: 10px;">
-                    📋 Copiar
-                </button>
+            <div class="code-preview-wrapper">
+                <button id="copyBtn" class="btn btn-sm btn-outline-secondary">📋 Copiar</button>
                 <pre id="codePreview" class="code-preview"></pre>
             </div>
 
-            <!-- Botão de Download e Barra de Progresso lado a lado -->
             <div style="display: flex; align-items: center; gap: 12px; margin-top: 20px;">
-                <form method="POST" action="{{ url_for('generate_code_route') }}">
+                <form method="POST" action="{{ url_for('generate_code_route') }}" target="_blank">
                     <input type="hidden" name="framework" id="hiddenFramework">
                     <input type="hidden" name="model_type" id="hiddenModelType">
                     <input type="hidden" name="data_type" id="hiddenDadosTypes">
                     <input type="hidden" name="model_name" id="hiddenModelName">
-                    <button type="submit" class="btn-pink" id="downloadBtn">Download</button>
+                    <button type="submit" class="btn-pink" id="downloadBtn">⬇️ Download</button>
                 </form>
             </div>
-        </div>
-        <!-- Botão do chat -->
-        <div id="chat-widget">
-        <div id="chat-icon">💬</div>
 
-        <div id="chat-box" class="hidden">
-            <div id="chat-header">
-            <span>Dúvidas? Pergunte aqui!</span>
-            <button id="close-chat">&times;</button>
+
+            <!-- AVISO IMPORTANTE -->
+            <div class="alert alert-warning mt-4" style="text-align: left;">
+                <strong>⚠️ Atenção:</strong> o código gerado serve como base inicial e pode precisar de ajustes conforme seu modelo. Antes de usar em produção:
+                <ul>
+                    <li>Verifique se os tipos de entrada estão de acordo com seu modelo.</li>
+                    <li>Valide o caminho do arquivo e arquitetura carregada.</li>
+                    <li>Confira se o deploy escolhido é o mais adequado.</li>
+                </ul>
+                <strong>Dica:</strong> Veja exemplos prontos de deploy:
+                <ul>
+                    <li><a href="https://streamlit.io/cloud" target="_blank">Deploy com Streamlit Cloud</a></li>
+                    <li><a href="https://huggingface.co/spaces" target="_blank">Deploy com Gradio (Hugging Face)</a></li>
+                </ul>
             </div>
-            <div id="chat-messages"></div>
-            <form id="chat-form">
-            <input type="text" id="chat-input" placeholder="Digite sua pergunta..." autocomplete="off" />
-            <button type="submit">Enviar</button>
-            </form>
         </div>
+
+        <!-- Chat Widget -->
+        <div id="chat-widget">
+            <div id="chat-icon">💬</div>
+            <div id="chat-box" class="hidden">
+                <div id="chat-header">
+                    <span>Dúvidas? Pergunte aqui!</span>
+                    <button id="close-chat">&times;</button>
+                </div>
+                <div id="chat-messages"></div>
+                <form id="chat-form">
+                    <input type="text" id="chat-input" placeholder="Digite sua pergunta..." autocomplete="off" />
+                    <button type="submit">Enviar</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
