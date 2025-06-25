@@ -190,20 +190,40 @@
   // FAQs com respostas detalhadas
   const faqs = [
     {
-      keywords: ['criar código', 'gerar código', 'como criar código', 'fazer código'],
-      answer: 'Para criar um código, selecione a linguagem desejada, defina os parâmetros e clique em "Gerar". O sistema vai fornecer o código automaticamente.'
+        keywords: ['o que é quickml', 'quickml', 'sobre quickml', 'ferramenta quickml'],
+        answer: 'QuickML é uma ferramenta que automatiza a geração de código para deploy de modelos de aprendizado de máquina em diferentes frameworks, facilitando o processo para usuários com diversos níveis de conhecimento técnico.'
     },
     {
-      keywords: ['funcionamento', 'como funciona', 'o que é isso', 'explicação'],
-      answer: 'Este gerador utiliza inteligência artificial para criar códigos baseados nas suas instruções. Basta preencher o formulário e receber o código pronto para uso.'
+        keywords: ['como funciona quickml', 'funcionamento quickml', 'usar quickml'],
+        answer: 'A ferramenta QuickML gera códigos prontos para deploy com base nos parâmetros que você seleciona, como o tipo de modelo, framework (Streamlit ou Gradio), e tipo de dados. Você só precisa informar esses detalhes e receberá um pacote pronto para rodar.'
     },
     {
-      keywords: ['suporte', 'ajuda', 'dúvidas', 'contato'],
-      answer: 'Se precisar de ajuda adicional, entre em contato pelo e-mail suporte@seusite.com ou pelo chat aqui mesmo.'
+        keywords: ['tipos de modelos', 'modelos quickml', 'modelos suportados'],
+        answer: 'QuickML suporta modelos populares como Keras (.h5), PyTorch e ResNet. Cada modelo pode ser configurado para diferentes tipos de dados, permitindo flexibilidade no desenvolvimento e deploy.'
     },
     {
-      keywords: ['template', 'modelo', 'exemplo de código'],
-      answer: 'Você pode escolher entre vários templates pré-definidos no menu para facilitar a criação do seu projeto.'
+        keywords: ['tipos de entrada', 'entrada quickml', 'dados entrada', 'formatos entrada'],
+        answer: 'Você pode escolher entre três tipos de entrada: imagens (image_input), dados numéricos (numeric_input) e texto (text_input). A ferramenta ajusta o código para processar adequadamente cada tipo de dado.'
+    },
+    {
+        keywords: ['classificação', 'tipo de classificação', 'classificar dados'],
+        answer: 'QuickML suporta tarefas de classificação básica, onde seu modelo pode prever categorias baseadas nos dados fornecidos. Para tarefas mais complexas, você pode adaptar o código gerado conforme necessário.'
+    },
+    {
+        keywords: ['deploy', 'deploy quickml', 'publicar app', 'colocar no ar'],
+        answer: 'Após gerar o código, você pode fazer o deploy usando Streamlit Cloud ou Hugging Face Spaces para Gradio. Ambas as plataformas oferecem formas simples e gratuitas de hospedar seu aplicativo e disponibilizá-lo online.'
+    },
+    {
+        keywords: ['requisitos', 'requirements', 'bibliotecas'],
+        answer: 'O código gerado inclui um arquivo requirements.txt com todas as dependências necessárias para rodar seu app, como streamlit, gradio, numpy, pandas, etc. Basta instalar essas bibliotecas antes do deploy.'
+    },
+    {
+        keywords: ['ajustes', 'customização', 'editar código'],
+        answer: 'O código gerado serve como base inicial. Você pode (e deve) ajustar o código para o seu modelo e caso de uso específicos, como mudar o pré-processamento dos dados ou a lógica do modelo, antes de colocar em produção.'
+    },
+    {
+        keywords: ['suporte', 'erro', 'problema'],
+        answer: 'Se precisar de ajuda adicional, entre em contato pelo e-mail thanizerodrigues@hotmail.com ou pelo chat aqui mesmo.'
     },
     {
       keywords: ['deploy streamlit', 'como fazer deploy streamlit', 'deploy com streamlit', 'publicar streamlit', 'colocar streamlit no ar'],

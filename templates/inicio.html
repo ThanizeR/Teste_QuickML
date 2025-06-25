@@ -27,33 +27,81 @@
 
         <p>
         O <strong>QuickML Creator</strong> é uma ferramenta criada para ajudar você a gerar códigos automaticamente a partir de configurações simples e intuitivas.
-        Com poucos cliques, você define os parâmetros do seu projeto e obtém o código pronto para uso — sem necessidade de programar do zero.
+        Com poucos cliques, você define os parâmetros do seu projeto e obtém o código pronto para uso sem necessidade de programar do zero.
         </p>
-
-        <p>
-        A navegação foi pensada para ser clara e objetiva, dividida em três etapas principais:
-        </p>
-
-        <ol>
-        <li><strong>🏠 Início:</strong> Página inicial, exibe como funciona a aplicação e como utilizá-la de forma eficiente.</li>
-        <li><strong>⚙️ Gerar Código:</strong> Selecione as configurações desejadas e gere seu código automaticamente, em tempo real.</li>
-        <li><strong>⬇️ Downloads:</strong> Acesse os códigos gerados e faça o download com apenas um clique.</li>
-        </ol>
-
         <p>
         Utilize o menu no topo da página para navegar entre as etapas. Todo o processo é rápido, eficiente e pensado para poupar seu tempo, mesmo que você não tenha experiência com programação.
         </p>
+        <section class="dicas-grid">
+          <h2>Dicas rápidas</h2>
 
+          <div class="grid-dicas">
+            <div class="dica-item">
+              <span>O que é Machine Learning?</span>
+              <button class="info-btn" aria-label="Informação sobre Machine Learning">i</button>
+              <p class="info-text">Área da Inteligência Artificial que permite computadores aprenderem padrões e fazer previsões automaticamente.</p>
+            </div>
+
+            <div class="dica-item">
+              <span>Benefícios do QuickML Creator</span>
+              <button class="info-btn" aria-label="Informação sobre benefícios do QuickML Creator">i</button>
+              <p class="info-text">Geração automática de código, redução do tempo de desenvolvimento e facilidade para iniciantes.</p>
+            </div>
+
+            <div class="dica-item">
+              <span>Métodos de Machine Learning</span>
+              <button class="info-btn" aria-label="Informação sobre métodos de Machine Learning">i</button>
+              <p class="info-text">Classificação (prever categorias), Regressão (prever valores contínuos), Clusterização (agrupar dados similares).</p>
+            </div>
+
+            <div class="dica-item">
+              <span>Dicas para usar a ferramenta</span>
+              <button class="info-btn" aria-label="Informação sobre dicas para usar a ferramenta">i</button>
+              <p class="info-text">Defina seu objetivo, prepare os dados, revise o código gerado e use o histórico de downloads.</p>
+            </div>
+          </div>
+        </section>
+        <p></p>
+        <p>
+        </p>
         <p>
         Se tiver dúvidas durante o uso, você pode contar com o <strong>chat integrado</strong> localizado no canto inferior direito para receber orientações e suporte ao vivo na página <strong> Gerar Código</strong>.
         </p>
-
+        <p> <strong>⚠️ Atenção:</strong> o código gerado serve como base inicial e pode precisar de ajustes conforme seu modelo.</p>
         <p>
         Explore, teste e aproveite ao máximo o poder da automação com o QuickML Creator!
         </p>
-    </div>
+      </div>
     </section>
 
-
 </body>
+
+<script>
+  document.querySelectorAll('.info-btn').forEach(button => {
+    button.addEventListener('click', e => {
+      e.stopPropagation();
+      const li = button.parentElement;
+      const alreadyOpen = li.classList.contains('show-info');
+
+      // Fecha todos
+      document.querySelectorAll('.dica-item.show-info').forEach(item => {
+        item.classList.remove('show-info');
+      });
+
+      // Se não estava aberto, abre o clicado
+      if (!alreadyOpen) {
+        li.classList.add('show-info');
+      }
+    });
+  });
+
+  // Fecha dicas ao clicar fora
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.dica-item.show-info').forEach(item => {
+      item.classList.remove('show-info');
+    });
+  });
+</script>
+
 </html>
+
