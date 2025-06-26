@@ -865,48 +865,6 @@ button.btn-rosa:hover, button.btn-pink:hover {
   font-weight: 700;          /* negrito destacado */
 }
 
-
-/* === Telas até 900px: tablets e notebooks menores === */
-@media (max-width: 900px) {
-  .auth-container {
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    transform: none;
-    padding: 40px 30px;
-    gap: 40px;
-    min-height: 100vh;
-  }
-
-  .auth-left img {
-    width: 280px; /* Aumentado de 200px para 280px */
-  }
-
-  .auth-box {
-    max-width: 600px;  /* Aumentado o limite */
-    width: 100%;
-    padding: 32px;      /* Levemente aumentado */
-  }
-
-  input, select, .form-control {
-    font-size: 1rem;
-    padding: 14px;
-  }
-
-  .auth-box h2 {
-    font-size: 1.8rem;
-  }
-
-  .auth-left .quote {
-    font-size: 1.2rem;
-  }
-
-  button.btn-rosa, button.btn-pink {
-    font-size: 1rem;
-    padding: 14px;
-  }
-}
-
 .flash-messages {
   margin-bottom: 15px;
   position: relative;
@@ -1124,5 +1082,46 @@ button.btn-rosa:hover, button.btn-pink:hover {
 
   .link-secundario {
     font-size: 1rem;
+  }
+}
+
+/* === Telas até 900px: tablets e notebooks menores === */
+@media (max-width: 900px) {
+  .auth-container {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transform: none;
+    padding: 40px 30px;
+    gap: 40px;
+    min-height: 100vh;
+  }
+
+  .auth-left img {
+    width: 280px; /* Aumentado de 200px para 280px */
+  }
+
+  .auth-box {
+    max-width: 600px;  /* Aumentado o limite */
+    width: 100%;
+    padding: 32px;      /* Levemente aumentado */
+  }
+
+  input, select, .form-control {
+    font-size: 1rem;
+    padding: 14px;
+  }
+
+  .auth-box h2 {
+    font-size: 1.8rem;
+  }
+
+  .auth-left .quote {
+    font-size: 1.2rem;
+  }
+
+  button.btn-rosa, button.btn-pink {
+    font-size: 1rem;
+    padding: 14px;
   }
 }
