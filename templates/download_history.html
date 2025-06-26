@@ -31,6 +31,10 @@
               </li>
               {% endfor %}
           </ul>
+          <form action="{{ url_for('clear_download_history') }}" method="post" onsubmit="return confirm('Tem certeza que deseja limpar todo o histórico de downloads?');" style="text-align: center; margin-top: 20px;">
+              <button type="submit" class="btn-danger-sm">🗑️ Limpar Histórico</button>
+          </form>
+
 
           <div class="pagination-buttons">
             <button id="prevPage" class="btn btn-secondary btn-sm" disabled aria-label="Página anterior">Anterior</button>

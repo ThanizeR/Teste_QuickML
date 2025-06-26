@@ -718,6 +718,15 @@ def chat():
 
     return render_template('chat.html', messages=chat_messages)
 
+
+@app.route('/clear_download_history', methods=['POST'])
+def clear_download_history():
+    # Limpa todos os downloads do banco de dados
+    Download.query.delete()
+    db.session.commit()
+    flash('Histórico de downloads limpo com sucesso.', 'success')
+    return redirect(url_for('download_history'))
+
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
