@@ -8,11 +8,32 @@ import pytz
 from io import BytesIO
 import zipfile
 from pytz import timezone, utc
+from flask_mail import Mail, Message
+from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from dotenv import load_dotenv
+load_dotenv()
+
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'supersecretkey'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config.update(
+    MAIL_SERVER=os.getenv('MAIL_SERVER'),
+    MAIL_PORT=int(os.getenv('MAIL_PORT')),
+    MAIL_USE_TLS=True,
+    MAIL_USERNAME=os.getenv('MAIL_USERNAME'),
+    MAIL_PASSWORD=os.getenv('MAIL_PASSWORD'),
+    MAIL_DEFAULT_SENDER=os.getenv('MAIL_DEFAULT_SENDER')
+)
+
+print(f"MAIL_SERVER: {os.getenv('MAIL_SERVER')}")
+print(f"MAIL_PORT: {os.getenv('MAIL_PORT')}")
+print(f"MAIL_USERNAME: {os.getenv('MAIL_USERNAME')}")
+
+mail = Mail(app)
+serializer = URLSafeTimedSerializer(app.secret_key)
 
 db = SQLAlchemy(app)
 login_manager = LoginManager()
@@ -597,6 +618,71 @@ def login():
             return redirect(url_for('index'))
 
     return render_template('login.html')
+
+@app.route('/recuperar', methods=['GET', 'POST'])
+def recuperar():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            flash("E-mail não encontrado", "danger")
+            return render_template('recuperar.html')
+
+        # Gera token para reset
+        token = serializer.dumps(email, salt='recuperar-senha')
+
+        # Monta link para resetar senha
+        link = url_for('resetar_senha', token=token, _external=True)
+
+        # Cria mensagem
+        msg = Message(
+            subject="Recuperação de Senha",
+            recipients=[email],
+            body=f"Olá {user.username},\n\nUse o link abaixo para redefinir sua senha:\n{link}\n\n"
+                 "Se não solicitou, ignore este email."
+        )
+
+        try:
+            mail.send(msg)
+            flash("E-mail de recuperação enviado! Verifique sua caixa de entrada.", "success")
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            flash(f"Erro ao enviar e-mail: {str(e)}", "danger")
+
+    return render_template('recuperar.html')
+
+@app.route('/resetar_senha/<token>', methods=['GET', 'POST'])
+def resetar_senha(token):
+    try:
+        email = serializer.loads(token, salt='recuperar-senha', max_age=3600)  # token válido por 1h
+    except SignatureExpired:
+        flash("Link expirou. Solicite a recuperação novamente.", "warning")
+        return redirect(url_for('recuperar'))
+    except BadSignature:
+        flash("Link inválido.", "danger")
+        return redirect(url_for('recuperar'))
+
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        flash("Usuário não encontrado.", "danger")
+        return redirect(url_for('recuperar'))
+
+    if request.method == 'POST':
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+
+        if not password or password != confirm_password:
+            flash("Senhas não coincidem ou estão vazias.", "warning")
+            return render_template('resetar.html')
+
+        user.password = generate_password_hash(password, method='pbkdf2:sha256')
+        db.session.commit()
+        flash("Senha redefinida com sucesso! Faça login.", "success")
+        return redirect(url_for('login'))
+
+    return render_template('resetar.html')
 
 @app.route('/logout')
 @login_required
