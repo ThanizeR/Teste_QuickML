@@ -560,9 +560,17 @@ def save_zip(framework, model_type, data_type, model_name, zip_path="app_package
 
 # --- Routes ---
 
-
 @app.route('/')
+def home():
+    # Página inicial pública, sem menu, só welcome e botão login
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    return render_template('home.html')  # seu arquivo com welcome e botão entrar
+
+@app.route('/index')
+@login_required
 def index():
+    # Página inicial após login, com menu
     return render_template('inicio.html', active_page='index')
 
 @app.route('/gerar_codigo')
@@ -689,7 +697,7 @@ def resetar_senha(token):
 def logout():
     logout_user()
     flash("Logged out", "info")
-    return redirect(url_for('login'))
+    return redirect(url_for('home'))
 
 @app.route('/profile')
 @login_required

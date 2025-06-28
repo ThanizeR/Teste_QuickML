@@ -205,18 +205,29 @@ input {
 }
 
 .radio-group {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+  display: flex;
+  gap: 30px;              /* espaço entre os dois rádios */
+  justify-content: flex-start; /* alinha à esquerda */
+  flex-wrap: nowrap;      /* força ficar tudo numa linha só */
 }
 
 .radio-group label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--text-light);
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;               /* espaço entre círculo e texto */
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;    /* impede quebra de texto no label */
 }
+
+.radio-group input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  flex-shrink: 0;
+}
+
 
 input[type="radio"] {
     accent-color: var(--primary-color);
@@ -1023,6 +1034,20 @@ button.btn-rosa:hover, button.btn-pink:hover {
     animation: fadeIn 0.3s ease-in-out;
 }
 
+#clear-chat {
+    background-color: #e91e63;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+#clear-chat:hover {
+    background-color: #d81b60;
+}
+
+
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(-5px); }
     to { opacity: 1; transform: translateY(0); }
@@ -1048,6 +1073,14 @@ button.btn-rosa:hover, button.btn-pink:hover {
   .auth-box {
     max-width: 100%;
     width: 100%;
+  }
+   .radio-group {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .radio-group label {
+    min-width: auto;
   }
 }
 

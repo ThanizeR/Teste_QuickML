@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bem-vindo - QuickML Creator</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+</head>
+<body>
+  <div class="home-container">
+    
+    <div class="left-content">
+      <h1>
+        Bem-vindo ao QuickML Creator
+      </h1>
+      
+      <p>
+        Do modelo ao deploy em poucos passos.
+      </p>
+      
+      <a href="{{ url_for('login') }}" class="btn-pink login-btn">Entrar</a>
+    </div>
+    
+    <div class="right-image">
+      <img src="{{ url_for('static', filename='logo2 css.png') }}" alt="Logo QuickML Creator" />
+    </div>
+    
+  </div>
+</body>
+</html>

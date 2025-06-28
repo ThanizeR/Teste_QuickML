@@ -1,0 +1,103 @@
+/* Página inicial com layout dividido e imagem controlada */
+
+body, html {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #0e003b;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-container {
+  display: flex;
+  width: 90%;
+  max-width: 1200px;
+  height: 80vh;
+}
+
+.left-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+}
+
+.left-content h1 {
+  font-size: 3.2rem;
+  font-weight: 900;
+  line-height: 1.0; /* Diminui o espaço entre linhas */
+  margin: 0 0 20px 0;
+  white-space: pre-line;
+}
+
+.left-content p {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin: 0 0 30px 0;
+  color: #eee;
+  white-space: pre-line;
+  line-height: 1.2; /* Diminui o espaço entre linhas do parágrafo */
+}
+
+.btn-pink.login-btn {
+  background-color: #e91e63;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 14px 48px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+  user-select: none;
+  display: inline-block;
+  width: fit-content;
+}
+
+.btn-pink.login-btn:hover,
+.btn-pink.login-btn:focus {
+  background-color: #d81b60;
+  outline: none;
+}
+
+.right-image {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.right-image img {
+  width: 90%;
+  max-width: 500px;
+  height: auto;
+}
+
+/* Responsivo para telas menores */
+@media (max-width: 900px) {
+  .home-container {
+    flex-direction: column-reverse;
+    height: auto;
+  }
+  .left-content {
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+  .left-content h1 {
+    font-size: 2.5rem;
+  }
+  .left-content p {
+    font-size: 1.2rem;
+  }
+  .right-image img {
+    width: 60%;
+  }
+}
