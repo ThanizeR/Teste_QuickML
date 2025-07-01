@@ -1,107 +1,115 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Início - Gerador de Código</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  <!-- Bootstrap CSS para o alerta, se desejar -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
 
   <!-- Menu Horizontal -->
-    <nav class="menu-horizontal">
-        <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
-        <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
-        <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
-        <a href="{{ url_for('logout') }}">⎋ Logout</a>
-    </nav>
-
+  <nav class="menu-horizontal">
+      <a href="{{ url_for('index') }}" class="{% if active_page == 'index' %}active{% endif %}">🏠 Início</a>
+      <a href="{{ url_for('wizard_preview') }}" class="{% if active_page == 'wizard_preview' %}active{% endif %}">⚙️ Gerar Código</a>
+      <a href="{{ url_for('download_history') }}" class="{% if active_page == 'download_history' %}active{% endif %}">⬇️ Downloads</a>
+      <a href="{{ url_for('logout') }}">⎋ Logout</a>
+  </nav>
 
   <!-- Conteúdo da Página Inicial -->
-    <section id="inicio" class="main-content">
+  <section id="inicio" class="main-content">
     <div class="inicio-container">
-        <div style="text-align: center; margin: 20px 0;">
+      <div style="text-align: center; margin: 20px 0;">
         <img src="{{ url_for('static', filename='logo2 vertical.png') }}" alt="Logo" class="top-logo" />
-        </div>
+      </div>
 
-        <h1>Bem-vindo ao QuickML Creator</h1>
+      <h1>Bem-vindo ao QuickML Creator</h1>
 
-        <p>
+      <p style="text-align: justify; text-indent: 2em;">
         O <strong>QuickML Creator</strong> é uma ferramenta criada para ajudar você a gerar códigos automaticamente a partir de configurações simples e intuitivas.
         Com poucos cliques, você define os parâmetros do seu projeto e obtém o código pronto para uso sem necessidade de programar do zero.
-        </p>
-        <p>
+      </p>
+
+      <p style="text-align: justify; text-indent: 2em;">
         Utilize o menu no topo da página para navegar entre as etapas. Todo o processo é rápido, eficiente e pensado para poupar seu tempo, mesmo que você não tenha experiência com programação.
-        </p>
-        <section class="dicas-grid">
-          <h2>Dicas rápidas</h2>
+      </p>
+      <!-- Restante do conteúdo (dicas rápidas, etc.) -->
+      <section class="dicas-grid">
+        <h2>Dicas rápidas</h2>
 
-          <div class="grid-dicas">
-            <div class="dica-item">
-              <span>O que é Machine Learning?</span>
-              <button class="info-btn" aria-label="Informação sobre Machine Learning">i</button>
-              <p class="info-text">Área da Inteligência Artificial que permite computadores aprenderem padrões e fazer previsões automaticamente.</p>
-            </div>
-
-            <div class="dica-item">
-              <span>Benefícios do QuickML Creator</span>
-              <button class="info-btn" aria-label="Informação sobre benefícios do QuickML Creator">i</button>
-              <p class="info-text">Geração automática de código, redução do tempo de desenvolvimento e facilidade para iniciantes.</p>
-            </div>
-
-            <div class="dica-item">
-              <span>Métodos de Machine Learning</span>
-              <button class="info-btn" aria-label="Informação sobre métodos de Machine Learning">i</button>
-              <p class="info-text">Classificação (prever categorias), Regressão (prever valores contínuos), Clusterização (agrupar dados similares).</p>
-            </div>
-
-            <div class="dica-item">
-              <span>Dicas para usar a ferramenta</span>
-              <button class="info-btn" aria-label="Informação sobre dicas para usar a ferramenta">i</button>
-              <p class="info-text">Defina seu objetivo, prepare os dados, revise o código gerado e use o histórico de downloads.</p>
-            </div>
+        <div class="grid-dicas">
+          <div class="dica-item">
+            <span>O que é Machine Learning?</span>
+            <button class="info-btn" aria-label="Informação sobre Machine Learning">i</button>
+            <p class="info-text">Área da Inteligência Artificial que permite computadores aprenderem padrões e fazer previsões automaticamente.</p>
           </div>
-        </section>
-        <p></p>
-        <p>
-        </p>
-        <p>
-        Se tiver dúvidas durante o uso, você pode contar com o <strong>chat integrado</strong> localizado no canto inferior direito para receber orientações e suporte ao vivo na página <strong> Gerar Código</strong>.
-        </p>
-        <p> <strong>⚠️ Atenção:</strong> o código gerado serve como base inicial e pode precisar de ajustes conforme seu modelo.</p>
-        <p>
-        Explore, teste e aproveite ao máximo o poder da automação com o QuickML Creator!
-        </p>
+
+          <div class="dica-item">
+            <span>Benefícios do QuickML Creator</span>
+            <button class="info-btn" aria-label="Informação sobre benefícios do QuickML Creator">i</button>
+            <p class="info-text">Geração automática de código, redução do tempo de desenvolvimento e facilidade para iniciantes.</p>
+          </div>
+
+          <div class="dica-item">
+            <span>Métodos de Machine Learning</span>
+            <button class="info-btn" aria-label="Informação sobre métodos de Machine Learning">i</button>
+            <p class="info-text">Classificação (prever categorias), Regressão (prever valores contínuos), Clusterização (agrupar dados similares).</p>
+          </div>
+
+          <div class="dica-item">
+            <span>Dicas para usar a ferramenta</span>
+            <button class="info-btn" aria-label="Informação sobre dicas para usar a ferramenta">i</button>
+            <p class="info-text">Defina seu objetivo, prepare os dados, revise o código gerado e use o histórico de downloads.</p>
+          </div>
+        </div>
+      </section>
+      <br>
+      <p style="text-align: justify; text-indent: 2em;">Se tiver dúvidas durante o uso, você pode contar com o <strong>chat integrado</strong> localizado no canto inferior direito para receber orientações e suporte ao vivo na página <strong>Gerar Código</strong>.</p>
+      <!-- Alerta com aviso e lista de modelos treinados -->
+      <div class="alert alert-warning mt-4" style="text-align: left;">
+        Estes modelos representam exemplos práticos baseados em <strong>TensorFlow/Keras</strong> e <strong>PyTorch</strong>, que são as duas principais bibliotecas utilizadas atualmente para criação e treinamento de modelos de machine learning e deep learning.
+        <br>
+        <strong>Modelos treinados utilizados como referência:</strong>
+        <ul>
+          <li><a href="https://github.com/amitrajitbose/cat-v-dog-classifier-pytorch" target="_blank" rel="noopener">Cat vs Dog Classifier (PyTorch)</a></li>
+          <li><a href="https://github.com/msakpal47/-Cat-vs-Dog-Image-Classifier" target="_blank" rel="noopener">Cat vs Dog Image Classifier (Keras)</a></li>
+          <li><a href="https://github.com/dnoak/AnaliseDeSentimentosPytorch/tree/master/pytorch/models" target="_blank" rel="noopener">Análise de Sentimentos (PyTorch)</a></li>
+          <li><a href="https://github.com/luisfredgs/sentiment-analysis-keras-lstm/tree/master/model" target="_blank" rel="noopener">Análise de Sentimentos (Keras)</a></li>
+          <li><a href="https://github.com/Anag0es/classificacao_numerica" target="_blank" rel="noopener">Classificação Numérica (Exemplo simples)</a></li>
+        </ul>
+          Portanto, a grande maioria dos modelos modernos e aplicados na indústria e na pesquisa são desenvolvidos nestas plataformas, justificando o foco do QuickML Creator nelas.
       </div>
-    </section>
+      <p>Explore, teste e aproveite ao máximo o poder da automação com o QuickML Creator!</p>
+    </div>
+  </section>
 
-</body>
+  <script>
+    document.querySelectorAll('.info-btn').forEach(button => {
+      button.addEventListener('click', e => {
+        e.stopPropagation();
+        const li = button.parentElement;
+        const alreadyOpen = li.classList.contains('show-info');
 
-<script>
-  document.querySelectorAll('.info-btn').forEach(button => {
-    button.addEventListener('click', e => {
-      e.stopPropagation();
-      const li = button.parentElement;
-      const alreadyOpen = li.classList.contains('show-info');
+        // Fecha todos
+        document.querySelectorAll('.dica-item.show-info').forEach(item => {
+          item.classList.remove('show-info');
+        });
 
-      // Fecha todos
+        // Se não estava aberto, abre o clicado
+        if (!alreadyOpen) {
+          li.classList.add('show-info');
+        }
+      });
+    });
+
+    // Fecha dicas ao clicar fora
+    document.addEventListener('click', () => {
       document.querySelectorAll('.dica-item.show-info').forEach(item => {
         item.classList.remove('show-info');
       });
-
-      // Se não estava aberto, abre o clicado
-      if (!alreadyOpen) {
-        li.classList.add('show-info');
-      }
     });
-  });
+  </script>
 
-  // Fecha dicas ao clicar fora
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.dica-item.show-info').forEach(item => {
-      item.classList.remove('show-info');
-    });
-  });
-</script>
-
+</body>
 </html>
-
