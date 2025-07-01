@@ -63,230 +63,195 @@ def load_user(user_id):
 def generate_streamlit_h5_numeric_input(model_name="Keras (.h5) - Numeric Input"):
     return f'''import streamlit as st
 import numpy as np
-from tensorflow.keras.models import load_model
+from keras.models import load_model
 
-st.title("Model - Keras (.h5) - Numeric Input")
+def predict_numeric(input_data):
+    model = load_model("models/{model_name}.h5")  # ajuste o caminho do seu modelo
+    input_array = np.array([input_data], dtype=np.float32)
+    pred_prob = model.predict(input_array)[0][0]
+    pred_class = 1 if pred_prob >= 0.5 else 0
+    return pred_class, pred_prob
 
-# ETAPA 1 - CARREGAR MODELO LOCALMENTE
-@st.cache_resource
-def load_model_from_disk():
-    model = load_model("models/{model_name}.h5)
+def page_numeric():
+    st.header("Predição com modelo Keras (.h5) - Entrada Numérica")
 
-model = load_model_from_disk()
+    Pregnancies = st.number_input('Número de Gestações', min_value=0, step=1)
+    Glucose = st.number_input('Nível de Glicose', min_value=0)
+    BloodPressure = st.number_input('Pressão Arterial', min_value=0)
+    SkinThickness = st.number_input('Espessura da Pele', min_value=0)
+    Insulin = st.number_input('Nível de Insulina', min_value=0)
+    BMI = st.number_input('IMC', min_value=0.0, format="%.2f")
+    DiabetesPedigreeFunction = st.number_input('Função Pedigree Diabetes', min_value=0.0, format="%.4f")
+    Age = st.number_input('Idade', min_value=0, step=1)
 
-# ETAPA 2 - INPUT NUMÉRICO
-input_number = st.number_input("Digite um valor numérico:")
+    if st.button("Prever"):
+        input_data = [Pregnancies, Glucose, BloodPressure, SkinThickness,
+                      Insulin, BMI, DiabetesPedigreeFunction, Age]
+        try:
+            pred_class, pred_prob = predict_numeric(input_data)
+            label = "Diabético" if pred_class == 1 else "Não diabético"
+            st.success(f"Predição: {{label}} (Probabilidade: {{pred_prob:.4f}})")
+        except Exception as e:
+            st.error(f"Erro na predição: {{e}}")
 
-# ETAPA 3 - PREDIÇÃO
-if st.button("Prever"):
-    input_data = np.array([[input_number]])
-    prediction = model.predict(input_data)
-    # st.write(f"Predição: {{prediction[0][0]:.4f}}")
-    st.write("Predição realizada! (Descomente a linha acima para exibir o valor)")
+menu = st.sidebar.radio(
+    "Navegação",
+    ["🔢 Entrada Numérica"]
+)
+
+def get_selected_page(menu):
+    if menu == "🔢 Entrada Numérica":
+        return "numeric"
+
+selected_page = get_selected_page(menu)
+
+def main(selected_page):
+    if selected_page == "numeric":
+        page_numeric()
+
+if __name__ == "__main__":
+    main(selected_page)
 '''
 
 # ========== KERAS (.h5) - ENTRADA DE TEXTO ==========
 def generate_streamlit_h5_text_input(model_name="Keras (.h5) - Text Input"):
     return f'''import streamlit as st
-from tensorflow.keras.models import load_model
+import numpy as np
+from keras.models import load_model
 
-st.title("Model - Keras (.h5) - Text Input")
+def dummy_text_preprocess(text):
+    max_len = 100
+    vec = np.zeros((1, max_len))
+    for i, c in enumerate(text.lower()):
+        if i >= max_len:
+            break
+        vec[0, i] = ord(c) / 255
+    return vec
 
-# ETAPA 1 - CARREGAR MODELO LOCALMENTE
-@st.cache_resource
-def load_model_from_disk():
-    model = load_model("models/{model_name}.h5")  # Ajuste o caminho
-    return model
+def predict_text(input_vec):
+    model = load_model("models/{model_name}.h5")  # ajuste o caminho do seu modelo
+    pred_prob = model.predict(input_vec)[0][0]
+    pred_class = 1 if pred_prob >= 0.5 else 0
+    return pred_class, pred_prob
 
-model = load_model_from_disk()
+def page_text():
+    st.header("Predição com modelo Keras (.h5) - Entrada Texto")
 
-# ETAPA 2 - INPUT DE TEXTO
-input_text = st.text_area("Digite um texto:")
+    input_text = st.text_area("Digite o texto para predição")
 
-# ETAPA 3 - PREDIÇÃO
-if st.button("Analisar"):
-    # Exemplo fictício. Substitua pelo seu pré-processamento real:
-    # input_processed = preprocess_text(input_text)
-    # prediction = model.predict(input_processed)
-    prediction = "Positivo (exemplo)"
-    st.write(f"Sentimento previsto: {{prediction}}")
+    if st.button("Analisar"):
+        if not input_text.strip():
+            st.warning("Digite algum texto para análise.")
+            return
+        try:
+            input_vec = dummy_text_preprocess(input_text)
+            pred_class, pred_prob = predict_text(input_vec)
+            label = "Positivo" if pred_class == 1 else "Negativo"
+            st.success(f"Predição: {{label}} (Probabilidade: {{pred_prob:.4f}})")
+        except Exception as e:
+            st.error(f"Erro na predição: {{e}}")
+
+menu = st.sidebar.radio(
+    "Navegação",
+    ["✍️ Entrada Texto"]
+)
+
+def get_selected_page(menu):
+    if menu == "✍️ Entrada Texto":
+        return "text"
+
+selected_page = get_selected_page(menu)
+
+def main(selected_page):
+    if selected_page == "text":
+        page_text()
+
+if __name__ == "__main__":
+    main(selected_page)
 '''
 
 # ========== KERAS (.h5) - ENTRADA DE IMAGEM ==========
 def generate_streamlit_h5_image_input(model_name="Keras (.h5) - Image Input"):
     return f'''import streamlit as st
-from tensorflow.keras.models import load_model
 from PIL import Image
 import numpy as np
+from keras.models import load_model
 
-st.title("Model - Keras (.h5) - Image Input")
+def predict_malaria(img):
+    img = img.resize((36,36))
+    img = np.asarray(img)
+    img = img.astype(np.float32) / 255.0
+    img = img.reshape((1,36,36,3))
+    model = load_model("models/{model_name}.h5")
+    pred_probs = model.predict(img)[0]
+    pred_class = np.argmax(pred_probs)
+    pred_prob = pred_probs[pred_class]
+    return pred_class, pred_prob
 
-# ETAPA 1 - CARREGAR MODELO LOCALMENTE
-@st.cache_resource
-def load_model_from_disk():
-    model = load_model("models/{model_name}.h5")  # Ajuste o caminho
-    return model
+def predict_pneumonia(img):
+    img = img.convert('L')
+    img = img.resize((36,36))
+    img = np.asarray(img)
+    img = img.astype(np.float32) / 255.0
+    img = img.reshape((1,36,36,1))
+    model = load_model("models/{model_name}.h5")
+    pred_probs = model.predict(img)[0]
+    pred_class = np.argmax(pred_probs)
+    pred_prob = pred_probs[pred_class]
+    return pred_class, pred_prob
 
-model = load_model_from_disk()
+def page_malaria():
+    st.header("Previsão de Malária")
+    uploaded_file = st.file_uploader("Faça o upload de uma imagem para previsão de malária", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        try:
+            img = Image.open(uploaded_file)
+            st.image(img, caption="Imagem enviada", use_column_width=True)
+            pred_class, pred_prob = predict_malaria(img)
+            if pred_class == 1:
+                st.success(f"Previsão: Infectado - Probabilidade: {{pred_prob*100:.2f}}%")
+            else:
+                st.success(f"Previsão: Não está infectado - Probabilidade: {{pred_prob*100:.2f}}%")
+        except Exception as e:
+            st.error(f"Erro ao prever Malária: {{str(e)}}")
 
-# ETAPA 2 - UPLOAD DA IMAGEM
-uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
-image = None
-if uploaded_image:
-    image = Image.open(uploaded_image).convert("RGB")
-    st.image(image, caption="Imagem carregada", use_column_width=True)
+def page_pneumonia():
+    st.header("Previsão de Pneumonia")
+    uploaded_file = st.file_uploader("Faça o upload de uma imagem para previsão de pneumonia", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        try:
+            img = Image.open(uploaded_file)
+            st.image(img, caption="Imagem enviada", use_column_width=True)
+            pred_class, pred_prob = predict_pneumonia(img)
+            if pred_class == 1:
+                st.success(f"Previsão: Pneumonia - Probabilidade: {{pred_prob*100:.2f}}%")
+            else:
+                st.success(f"Previsão: Saudável - Probabilidade: {{pred_prob*100:.2f}}%")
+        except Exception as e:
+            st.error(f"Erro ao prever Pneumonia: {{str(e)}}")
 
-# ETAPA 3 - PRÉ-PROCESSAMENTO
-def preprocess_image(image):
-    image = image.resize((224, 224))
-    img_array = np.array(image) / 255.0
-    img_array = np.expand_dims(img_array, axis=0)
-    return img_array
+def main(selected_page):
+    if selected_page == "Malaria":
+        page_malaria()
+    elif selected_page == "Pneumonia":
+        page_pneumonia()
 
-# ETAPA 4 - PREDIÇÃO
-if st.button("Classificar") and image:
-    input_data = preprocess_image(image)
-    prediction = model.predict(input_data)
-    score = prediction[0][0]
-    label = "Cachorro" if score >= 0.5 else "Gato"
-    st.write(f"Previsão: {{label}} (Score: {{score:.4f}})")
-'''
+menu = st.sidebar.radio(
+    "Navegação",
+    ["🦟 Detecção Malária", "🫁 Detecção Pneumonia"]
+)
 
-# ========== PYTORCH (.pth) - ENTRADA NUMÉRICA ==========
-def generate_streamlit_pytorch_numeric_input(model_name="PyTorch (.pth) - Numeric Input"):
-    return f'''import streamlit as st
-import torch
-import torch.nn as nn
+def get_selected_page(menu):
+    if menu == "🦟 Detecção Malária":
+        return "Malaria"
+    elif menu == "🫁 Detecção Pneumonia":
+        return "Pneumonia"
 
-st.title("Model - PyTorch (.pth) - Numeric Input")
+selected_page = get_selected_page(menu)
 
-# ETAPA 1 - DEFINIR ARQUITETURA
-class SimpleNumericModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.linear = nn.Linear(1, 1)
+if __name__ == "__main__":
+    main(selected_page)
 
-    def forward(self, x):
-        return self.linear(x)
-
-# ETAPA 2 - CARREGAR MODELO
-@st.cache_resource
-def load_model():
-    model = SimpleNumericModel()
-    model.load_state_dict(torch.load("models/{model_name}.pth", map_location=torch.device('cpu')))
-    model.eval()
-    return model
-
-model = load_model()
-
-# ETAPA 3 - INPUT
-input_number = st.number_input("Digite um valor numérico:")
-
-# ETAPA 4 - PREDIÇÃO
-if st.button("Prever"):
-    with torch.no_grad():
-        input_tensor = torch.tensor([[input_number]], dtype=torch.float32)
-        output = model(input_tensor)
-        prediction = output.item()
-        st.write(f"Predição: {{prediction:.4f}}")
-'''
-
-# ========== PYTORCH (.pth) - ENTRADA DE TEXTO ==========
-def generate_streamlit_pytorch_text_input(model_name="PyTorch (.pth) - Text Input"):
-    return f'''import streamlit as st
-import torch
-import torch.nn as nn
-
-st.title("Modelo - PyTorch (.pth) - Análise de Sentimento")
-
-# ETAPA 1 - DEFINIR ARQUITETURA DO MODELO
-class SimpleTextModel(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.fc = nn.Linear(100, 1)  # Exemplo: 100 features de entrada
-
-    def forward(self, x):
-        return self.fc(x)
-
-# ETAPA 2 - CARREGAR O MODELO
-@st.cache_resource
-def load_model():
-    model = SimpleTextModel()
-    model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))  # Ajuste o caminho
-    model.eval()
-    return model
-
-model = load_model()
-
-# ETAPA 3 - FUNÇÃO DE PRÉ-PROCESSAMENTO
-def preprocess_text(text):
-    """
-    Substitua por seu pré-processamento real.
-    Aqui estamos simulando um vetor de 100 features como entrada.
-    """
-    vector = torch.randn(1, 100)  # Exemplo fictício
-    return vector
-
-# ETAPA 4 - INPUT DO USUÁRIO
-input_text = st.text_area("Digite um texto:")
-
-# ETAPA 5 - PREDIÇÃO
-if st.button("Analisar Sentimento") and input_text:
-    with torch.no_grad():
-        input_tensor = preprocess_text(input_text)
-        output = model(input_tensor)
-        score = torch.sigmoid(output).item()
-        sentimento = "Positivo" if score >= 0.5 else "Negativo"
-        st.write(f"Sentimento previsto: {{sentimento}} (Score: {{score:.4f}})")
-elif st.button("Analisar Sentimento"):
-    st.warning("Por favor, digite um texto antes de analisar.")
-
-'''
-
-# ========== PYTORCH (.pth) - ENTRADA DE IMAGEM ==========
-def generate_streamlit_pytorch_image_input(model_name="PyTorch (.pth) - Image Input"):
-    return f'''import streamlit as st
-from PIL import Image
-import torch
-import torchvision.transforms as transforms
-from torchvision import models
-
-st.title("Model - PyTorch (.pth) - Image Input")
-
-# ETAPA 1 - DEFINIR O MODELO
-@st.cache_resource
-def load_model():
-    model = models.densenet121(pretrained=False)
-    model.classifier = torch.nn.Linear(model.classifier.in_features, 1)
-    model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))
-    model.eval()
-    return model
-
-model = load_model()
-
-# ETAPA 2 - PRÉ-PROCESSAMENTO
-def preprocess_image(image):
-    transform = transforms.Compose([
-        transforms.Resize((224, 224)),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ])
-    return transform(image).unsqueeze(0)
-
-# ETAPA 3 - UPLOAD DE IMAGEM
-uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
-
-if uploaded_image:
-    image = Image.open(uploaded_image).convert("RGB")
-    st.image(image, caption="Imagem carregada", use_column_width=True)
-
-    if st.button("Classificar"):
-        input_tensor = preprocess_image(image)
-        with torch.no_grad():
-            output = model(input_tensor)
-            score = torch.sigmoid(output).item()
-            label = "Cachorro" if score >= 0.5 else "Gato"
-            st.write(f"Previsão: {{label}} (Score: {{score:.4f}})")
 '''
 
 # ========== PICKLE (.pkl) - ENTRADA NUMÉRICA ==========
@@ -295,24 +260,53 @@ def generate_streamlit_resnet_numeric_input(model_name="Pickle (.pkl) - Numeric 
 import numpy as np
 import pickle
 
-st.title("Model - Pickle (.pkl) - Numeric Input")
+st.title("Predição com modelo Pickle (.sav/.pkl) - Entrada Numérica")
 
-# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+# Função para carregar modelo pickle (.sav ou .pkl)
 @st.cache_resource
 def load_model():
-    with open("models/{model_name}.pkl", "rb") as f:
+    with open("models/{model_name}.sav", "rb") as f:  # ajuste o caminho e nome do arquivo
         return pickle.load(f)
 
 model = load_model()
 
-# ETAPA 2 - INPUT NUMÉRICO
-input_number = st.number_input("Digite um valor numérico:")
+# Entrada numérica - Exemplo: 8 características para diabetes
+st.write("Insira os valores numéricos para predição:")
 
-# ETAPA 3 - PREDIÇÃO
-if st.button("Prever"):
-    input_data = np.array([[input_number]])
-    prediction = model.predict(input_data)
-    st.write(f"Predição: {{prediction[0]:.4f}}")
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    Pregnancies = st.number_input('Número de Gestações', min_value=0, step=1)
+with col2:
+    Glucose = st.number_input('Nível de Glicose', min_value=0)
+with col3:
+    BloodPressure = st.number_input('Pressão Arterial', min_value=0)
+
+with col1:
+    SkinThickness = st.number_input('Espessura da Pele', min_value=0)
+with col2:
+    Insulin = st.number_input('Nível de Insulina', min_value=0)
+with col3:
+    BMI = st.number_input('IMC', min_value=0.0, format="%.2f")
+
+with col1:
+    DiabetesPedigreeFunction = st.number_input('Função Pedigree Diabetes', min_value=0.0, format="%.4f")
+with col2:
+    Age = st.number_input('Idade', min_value=0, step=1)
+
+if st.button("Prever Diabetes"):
+    # Preparar input para o modelo (array 2D)
+    input_data = np.array([[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin,
+                            BMI, DiabetesPedigreeFunction, Age]])
+    try:
+        prediction = model.predict(input_data)
+        if prediction[0] == 1:
+            st.success("Resultado: A pessoa é diabética")
+        else:
+            st.success("Resultado: A pessoa não é diabética")
+    except Exception as e:
+        st.error(f"Erro na predição: {{e}}")
+
 '''
 
 # ========== PICKLE (.pkl) - ENTRADA DE TEXTO ==========
@@ -320,24 +314,30 @@ def generate_streamlit_resnet_text_input(model_name="Pickle (.pkl) - Text Input"
     return f'''import streamlit as st
 import pickle
 
-st.title("Model - Pickle (.pkl) - Text Input")
+st.title("Predição com modelo Pickle (.sav/.pkl) - Entrada Texto")
 
-# ETAPA 1 - CARREGAR MODELO
 @st.cache_resource
 def load_model():
-    with open("models/{model_name}.pkl", "rb") as f:
+    with open("models/{model_name}.pkl", "rb") as f:  # ajuste o nome do arquivo
         return pickle.load(f)
 
 model = load_model()
 
-# ETAPA 2 - INPUT DE TEXTO
-input_text = st.text_area("Digite um texto:")
+input_text = st.text_area("Digite o texto para análise")
 
-# ETAPA 3 - PREDIÇÃO
 if st.button("Analisar"):
-    # input_processed = preprocess(input_text)
-    prediction = "Positivo (exemplo)"
-    st.write(f"Sentimento previsto: {{prediction}}")
+    try:
+        # Aqui normalmente você faria algum pré-processamento do texto,
+        # ex: vetorizar, tokenizar, etc. Exemplo:
+        # processed_input = preprocess(input_text)
+        # prediction = model.predict([processed_input])
+        # Para exemplo, vou só simular a predição:
+        
+        prediction = model.predict([input_text])  # ou outra forma dependendo do modelo
+        st.write(f"Resultado da predição: {{prediction[0]}}")
+    except Exception as e:
+        st.error(f"Erro na predição: {{e}}")
+
 '''
 
 # ========== PICKLE (.pkl) - ENTRADA DE IMAGEM ==========
@@ -347,36 +347,37 @@ from PIL import Image
 import numpy as np
 import pickle
 
-st.title("Model - Pickle (.pkl) - Image Input")
+st.title("Predição com modelo Pickle (.sav/.pkl) - Entrada Imagem")
 
-# ETAPA 1 - CARREGAR MODELO LOCALMENTE
 @st.cache_resource
 def load_model():
-    with open("models/{model_name}.pkl", "rb") as f:
+    with open("models/{model_name}.sav", "rb") as f:  # ajuste o caminho/nome
         return pickle.load(f)
 
 model = load_model()
 
-# ETAPA 2 - UPLOAD DA IMAGEM
-uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
-image = None
-if uploaded_image:
-    image = Image.open(uploaded_image).convert("RGB")
-    st.image(image, caption="Imagem carregada", use_column_width=True)
+uploaded_file = st.file_uploader("Faça upload da imagem (jpg, png)", type=["jpg","jpeg","png"])
+if uploaded_file is not None:
+    try:
+        img = Image.open(uploaded_file).convert("RGB")
+        st.image(img, caption="Imagem carregada", use_column_width=True)
 
-# ETAPA 3 - EXTRAIR FEATURES
-def extract_features(image):
-    image = image.resize((64, 64))
-    img_array = np.array(image) / 255.0
-    return img_array.flatten().reshape(1, -1)
+        def extract_features(image):
+            # Exemplo: redimensiona e transforma em vetor
+            image = image.resize((64,64))
+            img_array = np.array(image)/255.0
+            return img_array.flatten().reshape(1, -1)
 
-# ETAPA 4 - PREDIÇÃO
-if st.button("Classificar") and image:
-    input_features = extract_features(image)
-    prediction = model.predict(input_features)
-    label_map = {{0: "Gato", 1: "Cachorro"}}
-    label = label_map.get(prediction[0], "Desconhecido")
-    st.write(f"Previsão: {{label}}")
+        features = extract_features(img)
+
+        if st.button("Classificar imagem"):
+            prediction = model.predict(features)
+            label_map = {0: "Classe 0", 1: "Classe 1"}  # ajuste as classes reais
+            label = label_map.get(prediction[0], "Desconhecido")
+            st.write(f"Previsão: {{label}}")
+    except Exception as e:
+        st.error(f"Erro ao processar a imagem: {{e}}")
+
 '''
 #########################################GRADIO############
 
@@ -385,127 +386,216 @@ def generate_gradio_h5_numeric_input(model_name="Keras .h5 Model with Numeric In
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# ETAPA 1 - Carregamento do modelo (ajuste o caminho do arquivo .h5)
+# Carregar o modelo Keras .h5
 model = load_model("models/{model_name}.h5")
 
-# ETAPA 2 - Função de predição
-def predict(number):
-    input_data = np.array([[number]])
+# Função de predição com valor numérico
+def predict_risk(value):
+    input_data = np.array([[value]])
     prediction = model.predict(input_data)
-    return f"Predição: {{prediction[0][0]:.4f}}"
+    score = prediction[0][0]
+    status = "Alto Risco" if score > 0.5 else "Baixo Risco"
+    return f"{{status}} (Confiança: {{score:.2%}})"
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="{model_name}")
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_risk,
+    inputs=gr.Number(label="Valor Numérico de Entrada"),
+    outputs=gr.Text(label="Resultado da Predição"),
+    title="Previsão de Risco com Modelo .h5"
+)
+
 iface.launch()
+
 '''
 
 def generate_gradio_h5_text_input(model_name="Keras .h5 Model with Text Input"):
     return f'''import gradio as gr
+import numpy as np
 from tensorflow.keras.models import load_model
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
 
-# ETAPA 1 - Carregamento do modelo (ajuste o caminho do arquivo .h5)
+# Exemplo de tokenizer fictício (você deve treinar e salvar um real)
+tokenizer = Tokenizer(num_words=1000)
+tokenizer.fit_on_texts(["exemplo"])  # necessário para evitar erro se o tokenizer for fictício
+
+# Carregar o modelo .h5
 model = load_model("models/{model_name}.h5")
 
-# ETAPA 2 - Função de predição
-def predict(text):
-    # Exemplo fictício, substitua pelo pré-processamento real
-    # input_processed = preprocess_text(text)
-    # prediction = model.predict(input_processed)
-    prediction = "Positivo (exemplo)"
-    return f"Sentimento previsto: {{prediction}}"
+# Função de predição com entrada de texto
+def predict_sentiment(text):
+    seq = tokenizer.texts_to_sequences([text])
+    padded = pad_sequences(seq, maxlen=100)
+    prediction = model.predict(padded)
+    score = prediction[0][0]
+    label = "Positivo" if score >= 0.5 else "Negativo"
+    return f"Sentimento: {{label}} (Confiança: {{score:.2%}})"
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="{model_name}")
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_sentiment,
+    inputs=gr.Textbox(lines=3, placeholder="Digite um texto aqui..."),
+    outputs=gr.Text(label="Resultado da Predição"),
+    title="Classificação de Sentimento com Modelo .h5"
+)
+
 iface.launch()
-'''
 
+'''
 def generate_gradio_h5_image_input(model_name="Keras .h5 Model with Image Input"):
     return f'''import gradio as gr
-from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
+from keras.models import load_model
 
-# ETAPA 1 - Carregamento do modelo
-model = load_model("models/{model_name}.h5")
+# Função de previsão de pneumonia
+def predict_pneumonia(img):
+    img = Image.fromarray(np.uint8(img))
+    img = img.convert('L')
+    img = img.resize((36,36))
+    img = np.asarray(img)
+    img = img.reshape((1,36,36,1))
+    img = img / 255.0
+    model = load_model("{model_name}.h5")
+    pred_probs = model.predict(img)[0]
+    pred_class = np.argmax(pred_probs)
+    pred_prob = pred_probs[pred_class]
+    if pred_class == 1:
+        pred_label = "Pneumonia"
+    else:
+        pred_label = "Saudável"
+    return pred_label, float(pred_prob)
 
-# ETAPA 2 - Função de pré-processamento e predição
-def predict(image):
-    image = image.resize((224, 224))
-    input_data = np.expand_dims(np.array(image) / 255.0, axis=0)
-    prediction = model.predict(input_data)
-    score = prediction[0][0]
-    label = "Cachorro" if score >= 0.5 else "Gato"
-    return f"Previsão: {{label}} (Score: {{score:.4f}})"
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_pneumonia,
+    inputs=gr.Image(type="numpy", label="Upload da Imagem de Raio-X"),
+    outputs=[
+        gr.Text(label="Diagnóstico"),
+        gr.Number(label="Probabilidade")
+    ],
+    title="Previsão de Pneumonia com Modelo .h5",
+    description="Faça upload de uma imagem de raio-x para detectar pneumonia (modelo Keras .h5)"
+)
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="{model_name}")
 iface.launch()
+
 '''
 
 def generate_gradio_resnet_numeric_input(model_name="Pickle .pkl Model with Numeric Input"):
     return f'''import gradio as gr
-import numpy as np
 import pickle
 
-# ETAPA 1 - Carregamento do modelo
-model = pickle.load(open("models/{model_name}.pkl", "rb"))
+# Carregamento do modelo
+with open("{model_name}.sav ou .pkl", "rb") as file:
+    diabetes_model = pickle.load(file)
 
-# ETAPA 2 - Função de predição
-def predict(number):
-    input_data = np.array([[number]])
-    prediction = model.predict(input_data)
-    return f"Predição: {{prediction[0]:.4f}}"
+# Função de predição para Diabetes
+def predict_diabetes(Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age):
+    try:
+        user_input = [float(Pregnancies), float(Glucose), float(BloodPressure), float(SkinThickness),
+                      float(Insulin), float(BMI), float(DiabetesPedigreeFunction), float(Age)]
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="{model_name}")
+        prediction = diabetes_model.predict([user_input])
+        if prediction[0] == 1:
+            return "A pessoa é diabética"
+        else:
+            return "A pessoa não é diabética"
+    except Exception as e:
+        return f"Erro: {{str(e)}}"
+
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_diabetes,
+    inputs=[
+        gr.Textbox(label="Número de Gestações"),
+        gr.Textbox(label="Nível de Glicose"),
+        gr.Textbox(label="Pressão Arterial"),
+        gr.Textbox(label="Espessura da Pele"),
+        gr.Textbox(label="Nível de Insulina"),
+        gr.Textbox(label="IMC"),
+        gr.Textbox(label="Função de Pedigree"),
+        gr.Textbox(label="Idade")
+    ],
+    outputs="text",
+    title="Previsão de Diabetes com Modelo Pickle (.sav)",
+    description="Insira os dados clínicos para prever se o paciente tem diabetes (modelo Random Forest carregado com pickle)"
+)
+
 iface.launch()
+
 '''
 
 def generate_gradio_resnet_text_input(model_name="Pickle .pkl  Model with Text Input"):
     return f'''import gradio as gr
 import pickle
 
-# ETAPA 1 - Carregamento do modelo
-model = pickle.load(open("models/{model_name}.pkl", "rb"))
+# Carregar o modelo e o vetor de texto
+with open("models/{model_name}.pkl", "rb") as f:
+    model = pickle.load(f)
 
-# ETAPA 2 - Função de predição
-def predict(text):
-    # Exemplo: input_processed = preprocess_text(text)
-    # prediction = model.predict([input_processed])
-    prediction = "Positivo (exemplo)"
-    return f"Sentimento previsto: {{prediction}}"
+with open("models/vectorizer.pkl", "rb") as f:
+    vectorizer = pickle.load(f)
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="{model_name}")
+# Função de predição
+def predict_sentiment(text):
+    if not text.strip():
+        return "Texto vazio!"
+    try:
+        X = vectorizer.transform([text])
+        prediction = model.predict(X)[0]
+        return f"Sentimento previsto: {{prediction}}"
+    except Exception as e:
+        return f"Erro ao prever: {{str(e)}}"
+
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_sentiment,
+    inputs=gr.Textbox(label="Digite um texto"),
+    outputs="text",
+    title="Classificação de Sentimentos com Pickle (.pkl)",
+    description="Classificador treinado em dados de texto. Usa vectorizer + modelo .pkl"
+)
+
 iface.launch()
+
 '''
 
 def generate_gradio_resnet_image_input(model_name="Pickle .pkl Model with Image Input"):
     return f'''import gradio as gr
-from PIL import Image
-import numpy as np
 import pickle
+import numpy as np
+from PIL import Image
 
-# ETAPA 1 - Carregamento do modelo
-model = pickle.load(open("models/{model_name}.pkl", "rb"))
+# Carrega o modelo treinado
+with open("models/{model_name}.pkl", "rb") as f:
+    model = pickle.load(f)
 
-# ETAPA 2 - Função de predição
-def extract_features(image):
-    image = image.resize((64, 64))
-    img_array = np.array(image) / 255.0
-    img_vector = img_array.flatten()
-    return img_vector
+# Pré-processamento e predição
+def predict_image(img):
+    try:
+        img = Image.fromarray(np.uint8(img)).convert("RGB")
+        img = img.resize((64, 64))  # ajuste conforme necessário
+        features = np.array(img) / 255.0
+        features = features.flatten().reshape(1, -1)
+        prediction = model.predict(features)[0]
+        label_map = {0: "Gato", 1: "Cachorro"}
+        return label_map.get(prediction, "Desconhecido")
+    except Exception as e:
+        return f"Erro: {{str(e)}}"
 
-def predict(image):
-    input_features = extract_features(image).reshape(1, -1)
-    prediction = model.predict(input_features)
-    label_map = {0: "Gato", 1: "Cachorro"}
-    label = label_map.get(prediction[0], "Desconhecido")
-    return f"Previsão: {{label}}"
+# Interface Gradio
+iface = gr.Interface(
+    fn=predict_image,
+    inputs=gr.Image(type="numpy", label="Imagem de Entrada"),
+    outputs="text",
+    title="Classificação de Imagem com Pickle (.pkl)",
+    description="Modelo treinado para classificar imagens simples (flattened RGB)"
+)
 
-# ETAPA 3 - Interface Gradio
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="{model_name}")
 iface.launch()
+
 '''
 
 def generate_gradio_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
@@ -724,9 +814,6 @@ def generate_code(framework, model_type, data_type, model_name):
             'resnet_numeric_input': generate_streamlit_resnet_numeric_input,
             'resnet_text_input': generate_streamlit_resnet_text_input,
             'resnet_image_input': generate_streamlit_resnet_image_input,
-            'pytorch_numeric_input': generate_streamlit_pytorch_numeric_input,
-            'pytorch_text_input': generate_streamlit_pytorch_text_input,
-            'pytorch_image_input': generate_streamlit_pytorch_image_input,
         }
     else:  # gradio
         mapping = {
