@@ -58,226 +58,364 @@ class Download(db.Model):
 def load_user(user_id):
     return User.query.get(int(user_id))
 # --- Wizard code generation functions ---
-
-
-def generate_streamlit_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
+#####KERAS
+# ========== KERAS (.h5) - ENTRADA NUMÉRICA ==========
+def generate_streamlit_h5_numeric_input(model_name="Keras (.h5) - Numeric Input"):
     return f'''import streamlit as st
 import numpy as np
 from tensorflow.keras.models import load_model
 
-st.title("Model Deployment - {model_name}")
+st.title("Model - Keras (.h5) - Numeric Input")
 
-# Upload do arquivo do modelo .h5
-uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
-model = None
-if uploaded_file:
-    model = load_model(uploaded_file)
-    st.success("Model loaded successfully!")
+# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+@st.cache_resource
+def load_model_from_disk():
+    model = load_model("models/{model_name}.h5)
 
-# Input numérico para o modelo
-input_number = st.number_input("Enter a numeric value")
+model = load_model_from_disk()
 
-if st.button("Predict"):
-    if model:
-        # Prepara o input para o modelo
-        input_data = np.array([[input_number]])
-        # Faz a predição (exemplo, ajuste conforme seu modelo)
-        prediction = model.predict(input_data)
-        st.write(f"Prediction: {{prediction[0][0]:.4f}}")
-    else:
-        st.error("Please upload a valid model first.")
+# ETAPA 2 - INPUT NUMÉRICO
+input_number = st.number_input("Digite um valor numérico:")
+
+# ETAPA 3 - PREDIÇÃO
+if st.button("Prever"):
+    input_data = np.array([[input_number]])
+    prediction = model.predict(input_data)
+    # st.write(f"Predição: {{prediction[0][0]:.4f}}")
+    st.write("Predição realizada! (Descomente a linha acima para exibir o valor)")
 '''
 
-def generate_streamlit_h5_text_input(model_name="Keras .h5 Model with Text Input"):
+# ========== KERAS (.h5) - ENTRADA DE TEXTO ==========
+def generate_streamlit_h5_text_input(model_name="Keras (.h5) - Text Input"):
     return f'''import streamlit as st
 from tensorflow.keras.models import load_model
 
-st.title("Model Deployment - {model_name}")
+st.title("Model - Keras (.h5) - Text Input")
 
-uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
-model = None
-if uploaded_file:
-    model = load_model(uploaded_file)
-    st.success("Model loaded successfully!")
+# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+@st.cache_resource
+def load_model_from_disk():
+    model = load_model("models/{model_name}.h5")  # Ajuste o caminho
+    return model
 
-input_text = st.text_area("Enter your text here")
+model = load_model_from_disk()
 
-if st.button("Predict"):
-    if model:
-        # Aqui você pode preprocessar o texto para o modelo
-        # prediction = model.predict(preprocess(input_text))
-        prediction = "Prediction example (adjust for your model)"
-        st.write(f"Prediction: {{prediction}}")
-    else:
-        st.error("Please upload a valid model first.")
+# ETAPA 2 - INPUT DE TEXTO
+input_text = st.text_area("Digite um texto:")
+
+# ETAPA 3 - PREDIÇÃO
+if st.button("Analisar"):
+    # Exemplo fictício. Substitua pelo seu pré-processamento real:
+    # input_processed = preprocess_text(input_text)
+    # prediction = model.predict(input_processed)
+    prediction = "Positivo (exemplo)"
+    st.write(f"Sentimento previsto: {{prediction}}")
 '''
 
-def generate_streamlit_h5_image_input(model_name="Keras .h5 Model with Image Input"):
+# ========== KERAS (.h5) - ENTRADA DE IMAGEM ==========
+def generate_streamlit_h5_image_input(model_name="Keras (.h5) - Image Input"):
     return f'''import streamlit as st
 from tensorflow.keras.models import load_model
 from PIL import Image
 import numpy as np
 
-st.title("Model Deployment - {model_name}")
+st.title("Model - Keras (.h5) - Image Input")
 
-uploaded_file = st.file_uploader("Upload your .h5 model file", type=["h5"])
-model = None
-if uploaded_file:
-    model = load_model(uploaded_file)
-    st.success("Model loaded successfully!")
+# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+@st.cache_resource
+def load_model_from_disk():
+    model = load_model("models/{model_name}.h5")  # Ajuste o caminho
+    return model
 
-uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
+model = load_model_from_disk()
+
+# ETAPA 2 - UPLOAD DA IMAGEM
+uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
 image = None
 if uploaded_image:
-    image = Image.open(uploaded_image)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    image = Image.open(uploaded_image).convert("RGB")
+    st.image(image, caption="Imagem carregada", use_column_width=True)
 
-if st.button("Predict"):
-    if model and image:
-        # Exemplo de preprocessamento e predição (ajuste conforme seu modelo)
-        # image = image.resize((224, 224))
-        # input_data = np.expand_dims(np.array(image), axis=0)
-        # prediction = model.predict(input_data)
-        prediction = "Prediction example (adjust for your model)"
-        st.write(f"Prediction: {{prediction}}")
-    elif not model:
-        st.error("Please upload a valid model first.")
-    else:
-        st.error("Please upload an image to predict.")
+# ETAPA 3 - PRÉ-PROCESSAMENTO
+def preprocess_image(image):
+    image = image.resize((224, 224))
+    img_array = np.array(image) / 255.0
+    img_array = np.expand_dims(img_array, axis=0)
+    return img_array
+
+# ETAPA 4 - PREDIÇÃO
+if st.button("Classificar") and image:
+    input_data = preprocess_image(image)
+    prediction = model.predict(input_data)
+    score = prediction[0][0]
+    label = "Cachorro" if score >= 0.5 else "Gato"
+    st.write(f"Previsão: {{label}} (Score: {{score:.4f}})")
 '''
 
-def generate_streamlit_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
-    return f'''import streamlit as st
-import numpy as np
-
-st.title("Model Deployment - {model_name}")
-
-input_number = st.number_input("Enter a numeric value")
-
-if st.button("Predict"):
-    # Aqui conecte ao seu modelo ResNet para input numérico
-    prediction = 0.75  # Exemplo fake
-    st.write(f"Prediction: {{prediction:.4f}}")
-'''
-
-def generate_streamlit_resnet_text_input(model_name="ResNet Model with Text Input"):
-    return f'''import streamlit as st
-
-st.title("Model Deployment - {model_name}")
-
-input_text = st.text_area("Enter your text here")
-
-if st.button("Predict"):
-    # Aqui conecte ao seu modelo ResNet para input texto
-    prediction = "Prediction example (adjust for your model)"
-    st.write(f"Prediction: {{prediction}}")
-'''
-
-def generate_streamlit_resnet_image_input(model_name="ResNet Model with Image Input"):
-    return f'''import streamlit as st
-from PIL import Image
-
-st.title("Model Deployment - {model_name}")
-
-uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-image = None
-if uploaded_image:
-    image = Image.open(uploaded_image)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
-
-if st.button("Predict"):
-    # Aqui conecte ao seu modelo ResNet para input imagem
-    prediction = "Prediction example (adjust for your model)"
-    st.write(f"Prediction: {{prediction}}")
-'''
-
-def generate_streamlit_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
+# ========== PYTORCH (.pth) - ENTRADA NUMÉRICA ==========
+def generate_streamlit_pytorch_numeric_input(model_name="PyTorch (.pth) - Numeric Input"):
     return f'''import streamlit as st
 import torch
-import numpy as np
+import torch.nn as nn
 
-st.title("Model Deployment - {model_name}")
+st.title("Model - PyTorch (.pth) - Numeric Input")
 
-input_number = st.number_input("Enter a numeric value")
+# ETAPA 1 - DEFINIR ARQUITETURA
+class SimpleNumericModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(1, 1)
 
-if st.button("Predict"):
-    # Exemplo de predição PyTorch (ajuste para seu modelo)
-    prediction = 0.88  # Valor fake
-    st.write(f"Prediction: {{prediction:.4f}}")
+    def forward(self, x):
+        return self.linear(x)
+
+# ETAPA 2 - CARREGAR MODELO
+@st.cache_resource
+def load_model():
+    model = SimpleNumericModel()
+    model.load_state_dict(torch.load("models/{model_name}.pth", map_location=torch.device('cpu')))
+    model.eval()
+    return model
+
+model = load_model()
+
+# ETAPA 3 - INPUT
+input_number = st.number_input("Digite um valor numérico:")
+
+# ETAPA 4 - PREDIÇÃO
+if st.button("Prever"):
+    with torch.no_grad():
+        input_tensor = torch.tensor([[input_number]], dtype=torch.float32)
+        output = model(input_tensor)
+        prediction = output.item()
+        st.write(f"Predição: {{prediction:.4f}}")
 '''
 
-def generate_streamlit_pytorch_text_input(model_name="PyTorch Model with Text Input"):
+# ========== PYTORCH (.pth) - ENTRADA DE TEXTO ==========
+def generate_streamlit_pytorch_text_input(model_name="PyTorch (.pth) - Text Input"):
     return f'''import streamlit as st
+import torch
+import torch.nn as nn
 
-st.title("Model Deployment - {model_name}")
+st.title("Modelo - PyTorch (.pth) - Análise de Sentimento")
 
-input_text = st.text_area("Enter your text here")
+# ETAPA 1 - DEFINIR ARQUITETURA DO MODELO
+class SimpleTextModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(100, 1)  # Exemplo: 100 features de entrada
 
-if st.button("Predict"):
-    # Exemplo de predição PyTorch texto (ajuste para seu modelo)
-    prediction = "Prediction example (adjust for your model)"
-    st.write(f"Prediction: {{prediction}}")
+    def forward(self, x):
+        return self.fc(x)
+
+# ETAPA 2 - CARREGAR O MODELO
+@st.cache_resource
+def load_model():
+    model = SimpleTextModel()
+    model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))  # Ajuste o caminho
+    model.eval()
+    return model
+
+model = load_model()
+
+# ETAPA 3 - FUNÇÃO DE PRÉ-PROCESSAMENTO
+def preprocess_text(text):
+    """
+    Substitua por seu pré-processamento real.
+    Aqui estamos simulando um vetor de 100 features como entrada.
+    """
+    vector = torch.randn(1, 100)  # Exemplo fictício
+    return vector
+
+# ETAPA 4 - INPUT DO USUÁRIO
+input_text = st.text_area("Digite um texto:")
+
+# ETAPA 5 - PREDIÇÃO
+if st.button("Analisar Sentimento") and input_text:
+    with torch.no_grad():
+        input_tensor = preprocess_text(input_text)
+        output = model(input_tensor)
+        score = torch.sigmoid(output).item()
+        sentimento = "Positivo" if score >= 0.5 else "Negativo"
+        st.write(f"Sentimento previsto: {{sentimento}} (Score: {{score:.4f}})")
+elif st.button("Analisar Sentimento"):
+    st.warning("Por favor, digite um texto antes de analisar.")
+
 '''
 
-def generate_streamlit_pytorch_image_input(model_name="PyTorch Model with Image Input"):
+# ========== PYTORCH (.pth) - ENTRADA DE IMAGEM ==========
+def generate_streamlit_pytorch_image_input(model_name="PyTorch (.pth) - Image Input"):
     return f'''import streamlit as st
 from PIL import Image
+import torch
+import torchvision.transforms as transforms
+from torchvision import models
 
-st.title("Model Deployment - {model_name}")
+st.title("Model - PyTorch (.pth) - Image Input")
 
-uploaded_image = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-image = None
+# ETAPA 1 - DEFINIR O MODELO
+@st.cache_resource
+def load_model():
+    model = models.densenet121(pretrained=False)
+    model.classifier = torch.nn.Linear(model.classifier.in_features, 1)
+    model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))
+    model.eval()
+    return model
+
+model = load_model()
+
+# ETAPA 2 - PRÉ-PROCESSAMENTO
+def preprocess_image(image):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    return transform(image).unsqueeze(0)
+
+# ETAPA 3 - UPLOAD DE IMAGEM
+uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
+
 if uploaded_image:
-    image = Image.open(uploaded_image)
-    st.image(image, caption="Uploaded Image", use_column_width=True)
+    image = Image.open(uploaded_image).convert("RGB")
+    st.image(image, caption="Imagem carregada", use_column_width=True)
 
-if st.button("Predict"):
-    # Exemplo de predição PyTorch imagem (ajuste para seu modelo)
-    prediction = "Prediction example (adjust for your model)"
-    st.write(f"Prediction: {{prediction}}")
+    if st.button("Classificar"):
+        input_tensor = preprocess_image(image)
+        with torch.no_grad():
+            output = model(input_tensor)
+            score = torch.sigmoid(output).item()
+            label = "Cachorro" if score >= 0.5 else "Gato"
+            st.write(f"Previsão: {{label}} (Score: {{score:.4f}})")
 '''
 
+# ========== PICKLE (.pkl) - ENTRADA NUMÉRICA ==========
+def generate_streamlit_resnet_numeric_input(model_name="Pickle (.pkl) - Numeric Input"):
+    return f'''import streamlit as st
+import numpy as np
+import pickle
 
-# --- Funções geradoras Gradio ---
+st.title("Model - Pickle (.pkl) - Numeric Input")
+
+# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+@st.cache_resource
+def load_model():
+    with open("models/{model_name}.pkl", "rb") as f:
+        return pickle.load(f)
+
+model = load_model()
+
+# ETAPA 2 - INPUT NUMÉRICO
+input_number = st.number_input("Digite um valor numérico:")
+
+# ETAPA 3 - PREDIÇÃO
+if st.button("Prever"):
+    input_data = np.array([[input_number]])
+    prediction = model.predict(input_data)
+    st.write(f"Predição: {{prediction[0]:.4f}}")
+'''
+
+# ========== PICKLE (.pkl) - ENTRADA DE TEXTO ==========
+def generate_streamlit_resnet_text_input(model_name="Pickle (.pkl) - Text Input"):
+    return f'''import streamlit as st
+import pickle
+
+st.title("Model - Pickle (.pkl) - Text Input")
+
+# ETAPA 1 - CARREGAR MODELO
+@st.cache_resource
+def load_model():
+    with open("models/{model_name}.pkl", "rb") as f:
+        return pickle.load(f)
+
+model = load_model()
+
+# ETAPA 2 - INPUT DE TEXTO
+input_text = st.text_area("Digite um texto:")
+
+# ETAPA 3 - PREDIÇÃO
+if st.button("Analisar"):
+    # input_processed = preprocess(input_text)
+    prediction = "Positivo (exemplo)"
+    st.write(f"Sentimento previsto: {{prediction}}")
+'''
+
+# ========== PICKLE (.pkl) - ENTRADA DE IMAGEM ==========
+def generate_streamlit_resnet_image_input(model_name="Pickle (.pkl) - Image Input"):
+    return f'''import streamlit as st
+from PIL import Image
+import numpy as np
+import pickle
+
+st.title("Model - Pickle (.pkl) - Image Input")
+
+# ETAPA 1 - CARREGAR MODELO LOCALMENTE
+@st.cache_resource
+def load_model():
+    with open("models/{model_name}.pkl", "rb") as f:
+        return pickle.load(f)
+
+model = load_model()
+
+# ETAPA 2 - UPLOAD DA IMAGEM
+uploaded_image = st.file_uploader("Upload da imagem", type=["jpg", "jpeg", "png"])
+image = None
+if uploaded_image:
+    image = Image.open(uploaded_image).convert("RGB")
+    st.image(image, caption="Imagem carregada", use_column_width=True)
+
+# ETAPA 3 - EXTRAIR FEATURES
+def extract_features(image):
+    image = image.resize((64, 64))
+    img_array = np.array(image) / 255.0
+    return img_array.flatten().reshape(1, -1)
+
+# ETAPA 4 - PREDIÇÃO
+if st.button("Classificar") and image:
+    input_features = extract_features(image)
+    prediction = model.predict(input_features)
+    label_map = {{0: "Gato", 1: "Cachorro"}}
+    label = label_map.get(prediction[0], "Desconhecido")
+    st.write(f"Previsão: {{label}}")
+'''
+#########################################GRADIO############
 
 def generate_gradio_h5_numeric_input(model_name="Keras .h5 Model with Numeric Input"):
     return f'''import gradio as gr
 import numpy as np
 from tensorflow.keras.models import load_model
 
-# Carregue seu modelo .h5 aqui (exemplo comentado)
-# model = load_model("seu_modelo.h5")
+# ETAPA 1 - Carregamento do modelo (ajuste o caminho do arquivo .h5)
+model = load_model("models/{model_name}.h5")
 
+# ETAPA 2 - Função de predição
 def predict(number):
-    # Converta a entrada para o formato esperado pelo modelo
     input_data = np.array([[number]])
-    
-    # Faça a predição com o modelo carregado
-    # prediction = model.predict(input_data)
-    
-    # Exemplo de predição fake para evitar erro:
-    prediction = np.array([[0.42]])
-    
-    # Retorne o resultado formatado
-    return f"Prediction: {{prediction[0][0]:.4f}}"
+    prediction = model.predict(input_data)
+    return f"Predição: {{prediction[0][0]:.4f}}"
 
-iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="{model_name}")
 iface.launch()
 '''
+
 def generate_gradio_h5_text_input(model_name="Keras .h5 Model with Text Input"):
     return f'''import gradio as gr
 from tensorflow.keras.models import load_model
 
-# Carregue seu modelo .h5 (descomente e ajuste o caminho)
-# model = load_model("seu_modelo.h5")
+# ETAPA 1 - Carregamento do modelo (ajuste o caminho do arquivo .h5)
+model = load_model("models/{model_name}.h5")
 
+# ETAPA 2 - Função de predição
 def predict(text):
-    # Exemplo: processar texto e fazer predição
-    # prediction = model.predict(processar_texto(text))
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    # Exemplo fictício, substitua pelo pré-processamento real
+    # input_processed = preprocess_text(text)
+    # prediction = model.predict(input_processed)
+    prediction = "Positivo (exemplo)"
+    return f"Sentimento previsto: {{prediction}}"
 
-iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="{model_name}")
 iface.launch()
 '''
 
@@ -287,107 +425,153 @@ from tensorflow.keras.models import load_model
 import numpy as np
 from PIL import Image
 
-# Carregue seu modelo .h5 (descomente e ajuste o caminho)
-# model = load_model("seu_modelo.h5")
+# ETAPA 1 - Carregamento do modelo
+model = load_model("models/{model_name}.h5")
 
+# ETAPA 2 - Função de pré-processamento e predição
 def predict(image):
-    # Exemplo: preprocessar imagem para o modelo
-    # image = image.resize((224, 224))
-    # input_data = np.expand_dims(np.array(image), axis=0)
-    # prediction = model.predict(input_data)
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    image = image.resize((224, 224))
+    input_data = np.expand_dims(np.array(image) / 255.0, axis=0)
+    prediction = model.predict(input_data)
+    score = prediction[0][0]
+    label = "Cachorro" if score >= 0.5 else "Gato"
+    return f"Previsão: {{label}} (Score: {{score:.4f}})"
 
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="{model_name}")
 iface.launch()
 '''
 
-def generate_gradio_resnet_numeric_input(model_name="ResNet Model with Numeric Input"):
+def generate_gradio_resnet_numeric_input(model_name="Pickle .pkl Model with Numeric Input"):
     return f'''import gradio as gr
 import numpy as np
+import pickle
 
-# Carregue seu modelo ResNet (exemplo)
-# model = ...
+# ETAPA 1 - Carregamento do modelo
+model = pickle.load(open("models/{model_name}.pkl", "rb"))
 
+# ETAPA 2 - Função de predição
 def predict(number):
     input_data = np.array([[number]])
-    # prediction = model.predict(input_data)
-    prediction = np.array([[0.77]])  # Exemplo fake
-    return f"Prediction: {{prediction[0][0]:.4f}}"
+    prediction = model.predict(input_data)
+    return f"Predição: {{prediction[0]:.4f}}"
 
-iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="{model_name}")
 iface.launch()
 '''
 
-def generate_gradio_resnet_text_input(model_name="ResNet Model with Text Input"):
+def generate_gradio_resnet_text_input(model_name="Pickle .pkl  Model with Text Input"):
     return f'''import gradio as gr
+import pickle
 
-# Carregue seu modelo ResNet (exemplo)
-# model = ...
+# ETAPA 1 - Carregamento do modelo
+model = pickle.load(open("models/{model_name}.pkl", "rb"))
 
+# ETAPA 2 - Função de predição
 def predict(text):
-    # prediction = model.predict(process_text(text))
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    # Exemplo: input_processed = preprocess_text(text)
+    # prediction = model.predict([input_processed])
+    prediction = "Positivo (exemplo)"
+    return f"Sentimento previsto: {{prediction}}"
 
-iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="{model_name}")
 iface.launch()
 '''
 
-def generate_gradio_resnet_image_input(model_name="ResNet Model with Image Input"):
+def generate_gradio_resnet_image_input(model_name="Pickle .pkl Model with Image Input"):
     return f'''import gradio as gr
 from PIL import Image
 import numpy as np
+import pickle
 
-# Carregue seu modelo ResNet (exemplo)
-# model = ...
+# ETAPA 1 - Carregamento do modelo
+model = pickle.load(open("models/{model_name}.pkl", "rb"))
+
+# ETAPA 2 - Função de predição
+def extract_features(image):
+    image = image.resize((64, 64))
+    img_array = np.array(image) / 255.0
+    img_vector = img_array.flatten()
+    return img_vector
 
 def predict(image):
-    # image = image.resize((224, 224))
-    # input_data = np.expand_dims(np.array(image), axis=0)
-    # prediction = model.predict(input_data)
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    input_features = extract_features(image).reshape(1, -1)
+    prediction = model.predict(input_features)
+    label_map = {0: "Gato", 1: "Cachorro"}
+    label = label_map.get(prediction[0], "Desconhecido")
+    return f"Previsão: {{label}}"
 
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="{model_name}")
 iface.launch()
 '''
 
 def generate_gradio_pytorch_numeric_input(model_name="PyTorch Model with Numeric Input"):
     return f'''import gradio as gr
 import torch
-import numpy as np
+import torch.nn as nn
 
-# Carregue seu modelo PyTorch (exemplo)
-# model = torch.load("seu_modelo.pth")
-# model.eval()
+# ETAPA 1 - Definição e carregamento do modelo
+class SimpleNumericModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.linear = nn.Linear(1, 1)
 
+    def forward(self, x):
+        return self.linear(x)
+
+model = SimpleNumericModel()
+model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))
+model.eval()
+
+# ETAPA 2 - Função de predição
 def predict(number):
-    input_tensor = torch.tensor([[number]], dtype=torch.float32)
-    # with torch.no_grad():
-    #     output = model(input_tensor)
-    # prediction = output.numpy()
-    prediction = np.array([[0.88]])  # Exemplo fake
-    return f"Prediction: {{prediction[0][0]:.4f}}"
+    with torch.no_grad():
+        input_tensor = torch.tensor([[number]], dtype=torch.float32)
+        output = model(input_tensor)
+        prediction = output.item()
+        return f"Predição: {{prediction:.4f}}"
 
-iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="number", outputs="text", title="{model_name}")
 iface.launch()
 '''
 
 def generate_gradio_pytorch_text_input(model_name="PyTorch Model with Text Input"):
     return f'''import gradio as gr
 import torch
+import torch.nn as nn
 
-# Carregue seu modelo PyTorch (exemplo)
-# model = torch.load("seu_modelo.pth")
-# model.eval()
+# ETAPA 1 - Definição e carregamento do modelo
+class SimpleTextModel(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.fc = nn.Linear(100, 1)
 
+    def forward(self, x):
+        return self.fc(x)
+
+model = SimpleTextModel()
+model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))
+model.eval()
+
+# Função fictícia de pré-processamento
+def preprocess_text(text):
+    return torch.randn(1, 100)
+
+# ETAPA 2 - Função de predição
 def predict(text):
-    # prediction = model(process_text(text))
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    with torch.no_grad():
+        input_tensor = preprocess_text(text)
+        output = model(input_tensor)
+        score = torch.sigmoid(output).item()
+        label = "Positivo" if score >= 0.5 else "Negativo"
+        return f"Sentimento previsto: {{label}} (Score: {{score:.4f}})"
 
-iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs="text", outputs="text", title="{model_name}")
 iface.launch()
 '''
 
@@ -395,24 +579,39 @@ def generate_gradio_pytorch_image_input(model_name="PyTorch Model with Image Inp
     return f'''import gradio as gr
 import torch
 from PIL import Image
-import numpy as np
+import torchvision.transforms as transforms
+from torchvision import models
 
-# Carregue seu modelo PyTorch (exemplo)
-# model = torch.load("seu_modelo.pth")
-# model.eval()
+# ETAPA 1 - Definição e carregamento do modelo
+model = models.densenet121(pretrained=False)
+model.classifier = torch.nn.Linear(model.classifier.in_features, 1)
+model.load_state_dict(torch.load("models/{model_name}.pth", map_location="cpu"))
+model.eval()
+
+# ETAPA 2 - Pré-processamento e predição
+def preprocess_image(image):
+    transform = transforms.Compose([
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ])
+    return transform(image).unsqueeze(0)
 
 def predict(image):
-    # image = image.resize((224, 224))
-    # input_tensor = transform(image).unsqueeze(0)
-    # with torch.no_grad():
-    #     output = model(input_tensor)
-    # prediction = output.numpy()
-    prediction = "resultado de predição (exemplo)"  # Exemplo fake
-    return f"Prediction: {{prediction}}"
+    input_tensor = preprocess_image(image)
+    with torch.no_grad():
+        output = model(input_tensor)
+        score = torch.sigmoid(output).item()
+        label = "Cachorro" if score >= 0.5 else "Gato"
+        return f"Previsão: {{label}} (Score: {{score:.4f}})"
 
-iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="Model Deployment - {model_name}")
+# ETAPA 3 - Interface Gradio
+iface = gr.Interface(fn=predict, inputs=gr.Image(type="pil"), outputs="text", title="{model_name}")
 iface.launch()
 '''
+
+
+#############################################
 def generate_requirements(framework):
     if framework == "streamlit":
         return "streamlit\ntensorflow\npillow"
@@ -422,78 +621,97 @@ def generate_requirements(framework):
 def generate_usage_header(framework, model_name):
     if framework == "streamlit":
         run_cmd = "streamlit run nome_do_arquivo.py"
-        install_cmd = "pip install streamlit tensorflow pillow"
+        install_cmd = "pip install -r requirements.txt"
         deploy_section = f"""
-☁️ 4. Deploy na Nuvem:
+4. Deploy na Nuvem:
 
-🌐 Streamlit Cloud (https://streamlit.io/cloud):
-   - Acesse o site e faça login com sua conta GitHub;
-   - Clique em 'New App' e selecione o repositório com este código;
-   - No campo "Main file path", indique: `nome_do_arquivo.py`;
-   - Certifique-se de ter um arquivo `requirements.txt` no repositório com as dependências;
-   - Clique em "Deploy" e pronto!
+Streamlit Cloud (https://streamlit.io/cloud):
+   - Acesse o site e conecte sua conta GitHub;
+   - Crie uma nova aplicação e selecione o repositório com seu código;
+   - Informe o caminho do arquivo principal (ex: nome_do_arquivo.py);
+   - Garanta que o repositório contenha o arquivo requirements.txt com as dependências;
+   - O Streamlit Cloud fará o deploy e disponibilizará a aplicação publicamente.
 
-📌 Dica:
-   - Streamlit Cloud é ideal para apps interativos com UI direta no navegador;
-   - Permite atualizações automáticas a partir do GitHub.
+Recomendações:
+   - Mantenha seu código e requisitos atualizados no GitHub para atualizações automáticas;
+   - Use variáveis de ambiente para proteger credenciais, se necessário;
+   - Verifique limites de recursos gratuitos do Streamlit Cloud para seu uso.
+
 """
-        deploy_note = "📌 Ideal para dashboards interativos com interface rápida e visual."
+        deploy_note = "Este framework é indicado para aplicações interativas com interface gráfica direta no navegador, ideal para dashboards e protótipos rápidos."
+        requirements_txt = """streamlit
+tensorflow
+torch
+torchvision
+gradio
+pillow
+numpy
+"""
     else:
         run_cmd = "python nome_do_arquivo.py"
-        install_cmd = "pip install gradio tensorflow pillow"
+        install_cmd = "pip install -r requirements.txt"
         deploy_section = f"""
-☁️ 4. Deploy na Nuvem:
+4. Deploy na Nuvem:
 
-🤗 Hugging Face Spaces (https://huggingface.co/spaces):
-   - Acesse o site e faça login;
-   - Clique em "Create New Space";
-   - Escolha o SDK: `Gradio`;
-   - Preencha nome e visibilidade do projeto;
-   - Faça upload deste script (`nome_do_arquivo.py`) e do `requirements.txt`;
-   - O arquivo será executado automaticamente se contiver:
-     ```python
-     import gradio as gr
-     ...
-     interface.launch()
-     ```
-   - Após o deploy, seu app estará acessível publicamente via URL.
+Hugging Face Spaces (https://huggingface.co/spaces):
+   - Crie uma conta ou faça login no Hugging Face;
+   - Crie um novo Space e escolha o SDK Gradio;
+   - Faça upload do seu script Python (ex: nome_do_arquivo.py) e do requirements.txt;
+   - O Space detecta e executa automaticamente o arquivo para iniciar seu app;
+   - A aplicação ficará disponível via URL pública.
 
-📌 Dica:
-   - Hugging Face Spaces é ideal para deploys rápidos e gratuitos com Gradio;
-   - Excelente para demonstração de modelos de IA com inputs customizados.
+Recomendações:
+   - Configure um arquivo requirements.txt preciso para evitar erros no deploy;
+   - Utilize variáveis de ambiente para manter segredos seguros;
+   - Aproveite o versionamento do Hugging Face para gerenciar atualizações.
+
 """
-        deploy_note = "📌 Ideal para APIs visuais simples e publicação fácil via Hugging Face Spaces."
+        deploy_note = "Indicado para aplicações rápidas, fáceis de publicar e compartilhar com inputs customizados, ideal para demonstrações de modelos ML/IA."
+        requirements_txt = """gradio
+tensorflow
+torch
+torchvision
+pillow
+numpy
+"""
 
     return f'''"""
-📦 Instruções de Uso - {model_name}
+Instruções de Uso - {model_name}
 
-Este código foi gerado automaticamente pelo QuickML Creator utilizando o framework: {framework.upper()}.
-{deploy_note}
+Este código foi gerado automaticamente pelo QuickML Creator usando o framework: {framework.upper()}.
 
-🔧 1. Instale as dependências:
+1. Instale as dependências necessárias:
    {install_cmd}
 
-▶️ 2. Execute localmente:
+   Conteúdo sugerido para requirements.txt:
+{requirements_txt}
+
+2. Execute o aplicativo localmente:
    {run_cmd}
 
-🧠 3. Como usar:
-   - Faça upload do seu modelo (ex: .h5, .pt);
-   - Insira os dados conforme o tipo de entrada (imagem, texto ou número);
-   - Veja os resultados da predição diretamente na interface.
+3. Como usar a aplicação:
+   - Faça upload do seu modelo treinado (ex: .h5, .pt, .pkl) no caminho especificado;
+   - Insira os dados de entrada conforme o tipo (número, texto ou imagem);
+   - Visualize os resultados das predições diretamente na interface web.
 
 {deploy_section}
 
-📁 Arquivo principal: nome_do_arquivo.py
-"""
-‼️ Agora siga com o seu código para gerar a aplicação web desejada.
+Arquivo principal da aplicação: nome_do_arquivo.py
 
-Este arquivo serve como ponto de partida. Implemente a lógica do seu modelo, as funções de predição e a interface de usuário conforme o framework escolhido.
+Este arquivo serve como ponto de partida para sua aplicação web de machine learning.
+Implemente a lógica do modelo, funções de pré-processamento, predição e a interface de usuário conforme o framework escolhido.
+
+Considere também:
+- Tratar erros e validar entradas para garantir uma boa experiência;
+- Documentar o código para facilitar manutenções futuras;
+- Proteger dados sensíveis, utilizando variáveis de ambiente para chaves e credenciais;
+- Testar a aplicação localmente antes do deploy para evitar falhas.
 
 Explore os recursos do Streamlit ou Gradio para criar uma experiência interativa e intuitiva para seu projeto de machine learning.
 
 Boa codificação! 🚀
+"""
 '''
-
 
 def generate_code(framework, model_type, data_type, model_name):
     key = f"{model_type}_{data_type}"

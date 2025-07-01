@@ -40,8 +40,8 @@
                         <select name="model_type" class="form-select" required data-bs-toggle="tooltip" title="Selecione o tipo do seu modelo de aprendizado de máquina.">
                             <option value="" disabled selected>Selecione o tipo de modelo</option>
                             <option value="h5" title="Modelo salvo no formato Keras .h5">Keras .h5</option>
-                            <option value="resnet" title="Modelo da arquitetura ResNet">ResNet</option>
-                            <option value="pytorch" title="Modelo treinado usando PyTorch">PyTorch</option>
+                            <option value="resnet" title="Modelo da arquitetura Pickle">Pickle .pkl</option>
+                            <option value="pytorch" title="Modelo treinado usando PyTorch">PyTorch .pt ou .pth</option>
                         </select>
                     </div>
                 </div>
@@ -84,8 +84,11 @@
 
             <!-- AVISO IMPORTANTE -->
             <div class="alert alert-warning mt-4" style="text-align: left;">
-                <strong>⚠️ Atenção:</strong> o código gerado serve como base inicial e pode precisar de ajustes conforme seu modelo. Antes de usar em produção:
+                <strong>⚠️ Atenção:</strong> o código gerado serve como base inicial e pode precisar de ajustes conforme seu modelo, os códigos disponíveis foram criados com base em modelos treinados simples (numéricos, texto e imagem) e têm como objetivo servir de referência para seus próprios projetos.
                 <ul>
+                    <li>Os modelos utilizados são básicos e exemplificam o funcionamento de uma aplicação com <strong>entrada e predição</strong>.</li>
+                    <li>Você pode usar os códigos como base e adaptar para o seu modelo específico (.h5, .pt, .pkl etc.).</li>
+                    <li>Todos os exemplos foram estruturados para facilitar a substituição por seus dados reais.</li>
                     <li>Verifique se os tipos de entrada estão de acordo com seu modelo.</li>
                     <li>Valide o caminho do arquivo e arquitetura carregada.</li>
                     <li>Confira se o deploy escolhido é o mais adequado.</li>
